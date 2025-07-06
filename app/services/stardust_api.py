@@ -162,5 +162,184 @@ class StardustAPIService:
         """Get FHIR audit logs"""
         return await self._make_request("GET", "/audit-logs", token, params={"skip": skip, "limit": limit})
 
-# Global service instance
+    # Master Data operations
+    async def get_master_data(self, token: str, data_type: str, skip: int = 0, limit: int = 100, 
+                             search: Optional[str] = None, province_code: Optional[int] = None, 
+                             district_code: Optional[int] = None):
+        """Get master data by type"""
+        # Map data types to actual Stardust endpoints (using working endpoints found)
+        endpoint_mapping = {
+            "provinces": "/admin/master-data/provinces",
+            "districts": "/admin/master-data/districts", 
+            "sub-districts": "/admin/master-data/sub_districts",  # Uses underscore
+            "hospital-types": "/admin/master-data/hospital_types",  # Uses underscore
+            "hospitals": "/admin/master-data/hospitals"
+        }
+        
+        endpoint = endpoint_mapping.get(data_type, f"/admin/master-data/{data_type}")
+        
+        params: dict = {"skip": skip, "limit": limit}
+        if search:
+            params["search"] = search
+        if province_code:
+            params["province_code"] = province_code
+        if district_code:
+            params["district_code"] = district_code
+        return await self._make_request("GET", endpoint, token, params=params)
+
+    async def get_master_data_record(self, token: str, data_type: str, record_id: str):
+        """Get specific master data record"""
+        endpoint_mapping = {
+            "provinces": f"/admin/master-data/provinces/{record_id}",
+            "districts": f"/admin/master-data/districts/{record_id}", 
+            "sub-districts": f"/admin/master-data/sub_districts/{record_id}",  # Uses underscore
+            "hospital-types": f"/admin/master-data/hospital_types/{record_id}",  # Uses underscore
+            "hospitals": f"/admin/master-data/hospitals/{record_id}"
+        }
+        endpoint = endpoint_mapping.get(data_type, f"/admin/master-data/{data_type}/{record_id}")
+        return await self._make_request("GET", endpoint, token)
+
+    async def create_master_data(self, token: str, data: dict):
+        """Create new master data record"""
+        data_type = data.get("data_type", "")
+        endpoint_mapping = {
+            "provinces": "/admin/master-data/provinces",
+            "districts": "/admin/master-data/districts", 
+            "sub-districts": "/admin/master-data/sub_districts",  # Uses underscore
+            "hospital-types": "/admin/master-data/hospital_types",  # Uses underscore
+            "hospitals": "/admin/master-data/hospitals"
+        }
+        endpoint = endpoint_mapping.get(data_type, "/admin/master-data")
+        return await self._make_request("POST", endpoint, token, data=data)
+
+    async def update_master_data(self, token: str, data_type: str, record_id: str, data: dict):
+        """Update master data record"""
+        endpoint_mapping = {
+            "provinces": f"/admin/master-data/provinces/{record_id}",
+            "districts": f"/admin/master-data/districts/{record_id}", 
+            "sub-districts": f"/admin/master-data/sub_districts/{record_id}",  # Uses underscore
+            "hospital-types": f"/admin/master-data/hospital_types/{record_id}",  # Uses underscore
+            "hospitals": f"/admin/master-data/hospitals/{record_id}"
+        }
+        endpoint = endpoint_mapping.get(data_type, f"/admin/master-data/{data_type}/{record_id}")
+        return await self._make_request("PUT", endpoint, token, data=data)
+
+    async def delete_master_data(self, token: str, data_type: str, record_id: str):
+        """Soft delete master data record"""
+        endpoint_mapping = {
+            "provinces": f"/admin/master-data/provinces/{record_id}",
+            "districts": f"/admin/master-data/districts/{record_id}", 
+            "sub-districts": f"/admin/master-data/sub_districts/{record_id}",  # Uses underscore
+            "hospital-types": f"/admin/master-data/hospital_types/{record_id}",  # Uses underscore
+            "hospitals": f"/admin/master-data/hospitals/{record_id}"
+        }
+        endpoint = endpoint_mapping.get(data_type, f"/admin/master-data/{data_type}/{record_id}")
+        return await self._make_request("DELETE", endpoint, token)
+
+    # Province operations
+    async def get_provinces(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None):
+        """Get list of provinces"""
+        return await self.get_master_data(token, "provinces", skip, limit, search)
+
+    async def get_province(self, token: str, province_id: str):
+        """Get province by ID"""
+        return await self.get_master_data_record(token, "provinces", province_id)
+
+    async def create_province(self, token: str, province_data: dict):
+        """Create new province"""
+        province_data["data_type"] = "provinces"
+        return await self.create_master_data(token, province_data)
+
+    async def update_province(self, token: str, province_id: str, province_data: dict):
+        """Update province"""
+        return await self.update_master_data(token, "provinces", province_id, province_data)
+
+    async def delete_province(self, token: str, province_id: str):
+        """Delete province"""
+        return await self.delete_master_data(token, "provinces", province_id)
+
+    # District operations
+    async def get_districts(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None, 
+                           province_code: Optional[int] = None):
+        """Get list of districts"""
+        return await self.get_master_data(token, "districts", skip, limit, search, province_code)
+
+    async def get_district(self, token: str, district_id: str):
+        """Get district by ID"""
+        return await self.get_master_data_record(token, "districts", district_id)
+
+    async def create_district(self, token: str, district_data: dict):
+        """Create new district"""
+        district_data["data_type"] = "districts"
+        return await self.create_master_data(token, district_data)
+
+    async def update_district(self, token: str, district_id: str, district_data: dict):
+        """Update district"""
+        return await self.update_master_data(token, "districts", district_id, district_data)
+
+    async def delete_district(self, token: str, district_id: str):
+        """Delete district"""
+        return await self.delete_master_data(token, "districts", district_id)
+
+    # Sub-District operations
+    async def get_sub_districts(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None, 
+                               province_code: Optional[int] = None, district_code: Optional[int] = None):
+        """Get list of sub-districts"""
+        return await self.get_master_data(token, "sub-districts", skip, limit, search, province_code, district_code)
+
+    async def get_sub_district(self, token: str, sub_district_id: str):
+        """Get sub-district by ID"""
+        return await self.get_master_data_record(token, "sub-districts", sub_district_id)
+
+    async def create_sub_district(self, token: str, sub_district_data: dict):
+        """Create new sub-district"""
+        sub_district_data["data_type"] = "sub-districts"
+        return await self.create_master_data(token, sub_district_data)
+
+    async def update_sub_district(self, token: str, sub_district_id: str, sub_district_data: dict):
+        """Update sub-district"""
+        return await self.update_master_data(token, "sub-districts", sub_district_id, sub_district_data)
+
+    async def delete_sub_district(self, token: str, sub_district_id: str):
+        """Delete sub-district"""
+        return await self.delete_master_data(token, "sub-districts", sub_district_id)
+
+    # Hospital Type operations
+    async def get_hospital_types(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None):
+        """Get list of hospital types"""
+        return await self.get_master_data(token, "hospital-types", skip, limit, search)
+
+    async def get_hospital_type(self, token: str, hospital_type_id: str):
+        """Get hospital type by ID"""
+        return await self.get_master_data_record(token, "hospital-types", hospital_type_id)
+
+    async def create_hospital_type(self, token: str, hospital_type_data: dict):
+        """Create new hospital type"""
+        hospital_type_data["data_type"] = "hospital-types"
+        return await self.create_master_data(token, hospital_type_data)
+
+    async def update_hospital_type(self, token: str, hospital_type_id: str, hospital_type_data: dict):
+        """Update hospital type"""
+        return await self.update_master_data(token, "hospital-types", hospital_type_id, hospital_type_data)
+
+    async def delete_hospital_type(self, token: str, hospital_type_id: str):
+        """Delete hospital type"""
+        return await self.delete_master_data(token, "hospital-types", hospital_type_id)
+
+    # Enhanced Hospital operations with master data support
+    async def create_hospital(self, token: str, hospital_data: dict):
+        """Create new hospital"""
+        hospital_data["data_type"] = "hospitals"
+        return await self.create_master_data(token, hospital_data)
+
+    async def update_hospital(self, token: str, hospital_id: str, hospital_data: dict):
+        """Update hospital"""
+        return await self.update_master_data(token, "hospitals", hospital_id, hospital_data)
+
+    async def delete_hospital(self, token: str, hospital_id: str):
+        """Delete hospital"""
+        return await self.delete_master_data(token, "hospitals", hospital_id)
+
+
+# Global instance
 stardust_api = StardustAPIService()

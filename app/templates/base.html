@@ -170,6 +170,81 @@
                                     <span class="nav-link-title">Patients</span>
                                 </a>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#navbar-master-data" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2"/>
+                                            <path d="M4 13a8.1 8.1 0 0 0 15.5 2"/>
+                                            <path d="M12 12v-1l-1 1"/>
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title">{{ "ข้อมูลหลัก" if language == 'th' else "Master Data" }}</span>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="/admin/master-data">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M4 4h6v6h-6z"/>
+                                            <path d="M14 4h6v6h-6z"/>
+                                            <path d="M4 14h6v6h-6z"/>
+                                            <path d="M14 14h6v6h-6z"/>
+                                        </svg>
+                                        {{ "ภาพรวม" if language == 'th' else "Overview" }}
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/admin/master-data/provinces">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                            <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                        </svg>
+                                        {{ "จังหวัด" if language == 'th' else "Provinces" }}
+                                    </a>
+                                    <a class="dropdown-item" href="/admin/master-data/districts">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
+                                            <path d="M9 4v13"/>
+                                            <path d="M15 7v13"/>
+                                        </svg>
+                                        {{ "อำเภอ" if language == 'th' else "Districts" }}
+                                    </a>
+                                    <a class="dropdown-item" href="/admin/master-data/sub-districts">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                            <path d="M12.02 21.485a1.996 1.996 0 0 1 -1.433 -.585l-4.244 -4.243a8 8 0 1 1 11.314 0l-4.243 4.243a1.996 1.996 0 0 1 -1.394 .585z"/>
+                                        </svg>
+                                        {{ "ตำบล" if language == 'th' else "Sub-Districts" }}
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/admin/master-data/hospital-types">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M3 21l18 0"/>
+                                            <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
+                                            <path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4"/>
+                                            <path d="M10 9l4 0"/>
+                                            <path d="M12 7l0 4"/>
+                                        </svg>
+                                        {{ "ประเภทโรงพยาบาล" if language == 'th' else "Hospital Types" }}
+                                    </a>
+                                    <a class="dropdown-item" href="/admin/master-data/hospitals">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M12.5 16h-8.5a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v7.5"/>
+                                            <path d="M16 19h6"/>
+                                            <path d="M19 16v6"/>
+                                            <path d="M9 10h1"/>
+                                            <path d="M9 13h1"/>
+                                            <path d="M9 16h1"/>
+                                        </svg>
+                                        {{ "โรงพยาบาล" if language == 'th' else "Hospitals" }}
+                                    </a>
+                                </div>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/admin/hospitals">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">

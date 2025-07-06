@@ -45,6 +45,10 @@ app.include_router(kati.router, prefix="/devices/kati", tags=["Kati Devices"])
 app.include_router(qube_vital.router, prefix="/devices/qube-vital", tags=["Qube-Vital Devices"])
 app.include_router(api.router, prefix="/api", tags=["API"])
 
+# Import and include master data routes
+from app.routes import master_data
+app.include_router(master_data.router, prefix="/admin", tags=["Master Data"])
+
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     """Main dashboard page"""

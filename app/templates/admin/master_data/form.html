@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/master-data">{{ "ข้อมูลหลัก" if language == 'th' else "Master Data" }}</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/master-data/{{ data_type }}">{{ data_config.title_th if language == 'th' else data_config.title }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ "แก้ไข" if is_edit else ("เพิ่มใหม่" if language == 'th' else "Add New") }}</li>
+                        </ol>
+                    </nav>
+                    <h2 class="page-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            {% if is_edit %}
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                            <path d="M16 5l3 3"/>
+                            {% else %}
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 5l0 14"/>
+                            <path d="M5 12l14 0"/>
+                            {% endif %}
+                        </svg>
+                        {{ ("แก้ไข" + data_config.singular_th) if is_edit and language == 'th' else ("เพิ่ม" + data_config.singular_th + "ใหม่") if language == 'th' else ("Edit " + data_config.singular) if is_edit else ("Add New " + data_config.singular) }}
+                    </h2>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+                        <a href="/admin/master-data/{{ data_type }}" class="btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M9 14l-4 -4l4 -4"/>
+                                <path d="M5 10h11a4 4 0 1 1 0 8h-1"/>
+                            </svg>
+                            {{ "กลับ" if language == 'th' else "Back" }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Messages -->
+        {% if request.query_params.get('error') or error %}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M10.29 3.86l-1.82 16.09a1.5 1.5 0 0 0 1.48 1.66h4.1a1.5 1.5 0 0 0 1.48 -1.66l-1.82 -16.09a1.5 1.5 0 0 0 -1.48 -1.34h-0.76a1.5 1.5 0 0 0 -1.48 1.34z"/>
+                        <path d="M12 9v4"/>
+                        <path d="M12 17l.01 0"/>
+                    </svg>
+                </div>
+                <div>{{ request.query_params.get('error') or error }}</div>
+            </div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ ("ข้อมูล" + data_config.singular_th) if language == 'th' else (data_config.singular + " Information") }}</h3>
+                    </div>
+                    <form method="POST" action="{% if is_edit %}/admin/master-data/{{ data_type }}/{{ record._id }}/update{% else %}/admin/master-data/{{ data_type }}{% endif %}">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Name (English) -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ "ชื่อ (ภาษาอังกฤษ)" if language == 'th' else "Name (English)" }}</label>
+                                        <input type="text" class="form-control" name="name_en" value="{{ record.name | localized_name('en') if record and record.name else '' }}" required>
+                                        <small class="form-hint">{{ "ชื่อในภาษาอังกฤษ" if language == 'th' else "Name in English language" }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- Name (Thai) -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ "ชื่อ (ภาษาไทย)" if language == 'th' else "Name (Thai)" }}</label>
+                                        <input type="text" class="form-control" name="name_th" value="{{ record.name | localized_name('th') if record and record.name else '' }}" required>
+                                        <small class="form-hint">{{ "ชื่อในภาษาไทย" if language == 'th' else "Name in Thai language" }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- Code -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ "รหัส" if language == 'th' else "Code" }}</label>
+                                        <input type="text" class="form-control" name="code" value="{{ record.code if record else '' }}" required>
+                                        <small class="form-hint">{{ "รหัสเฉพาะของรายการ" if language == 'th' else "Unique identifier code" }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "สถานะ" if language == 'th' else "Status" }}</label>
+                                        <div>
+                                            <label class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="is_active" {% if not record or record.is_active %}checked{% endif %}>
+                                                <span class="form-check-label">{{ "ใช้งาน" if language == 'th' else "Active" }}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Province (for Districts, Sub-Districts, Hospitals) -->
+                                {% if data_type in ['districts', 'sub-districts', 'hospitals'] %}
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ "จังหวัด" if language == 'th' else "Province" }}</label>
+                                        <select class="form-select" name="province_code" id="province_select" required>
+                                            <option value="">{{ "เลือกจังหวัด" if language == 'th' else "Select Province" }}</option>
+                                            {% for province in provinces %}
+                                            <option value="{{ province.code }}" {% if record and record.province_code == province.code %}selected{% endif %}>
+                                                {{ province.name | localized_name(language) }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- District (for Sub-Districts, Hospitals) -->
+                                {% if data_type in ['sub-districts', 'hospitals'] %}
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ "อำเภอ" if language == 'th' else "District" }}</label>
+                                        <select class="form-select" name="district_code" id="district_select" required>
+                                            <option value="">{{ "เลือกอำเภอ" if language == 'th' else "Select District" }}</option>
+                                            {% for district in districts %}
+                                            <option value="{{ district.code }}" {% if record and record.district_code == district.code %}selected{% endif %}>
+                                                {{ district.name | localized_name(language) }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Sub-District specific fields -->
+                                {% if data_type == 'sub-districts' %}
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "รหัสไปรษณีย์" if language == 'th' else "Postal Code" }}</label>
+                                        <input type="text" class="form-control" name="postal_code" value="{{ record.additional_fields.postal_code if record and record.additional_fields else '' }}">
+                                        <small class="form-hint">{{ "รหัสไปรษณีย์ของตำบล" if language == 'th' else "Postal code for this sub-district" }}</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Hospital Type specific fields -->
+                                {% if data_type == 'hospital-types' %}
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "คำอธิบาย (ภาษาอังกฤษ)" if language == 'th' else "Description (English)" }}</label>
+                                        <textarea class="form-control" name="description_en" rows="3">{{ record.additional_fields.description.en if record and record.additional_fields and record.additional_fields.description else '' }}</textarea>
+                                        <small class="form-hint">{{ "คำอธิบายประเภทโรงพยาบาลในภาษาอังกฤษ" if language == 'th' else "Hospital type description in English" }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "คำอธิบาย (ภาษาไทย)" if language == 'th' else "Description (Thai)" }}</label>
+                                        <textarea class="form-control" name="description_th" rows="3">{{ record.additional_fields.description.th if record and record.additional_fields and record.additional_fields.description else '' }}</textarea>
+                                        <small class="form-hint">{{ "คำอธิบายประเภทโรงพยาบาลในภาษาไทย" if language == 'th' else "Hospital type description in Thai" }}</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Hospital specific fields -->
+                                {% if data_type == 'hospitals' %}
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "ประเภทโรงพยาบาล" if language == 'th' else "Hospital Type" }}</label>
+                                        <select class="form-select" name="hospital_type_code">
+                                            <option value="">{{ "เลือกประเภทโรงพยาบาล" if language == 'th' else "Select Hospital Type" }}</option>
+                                            {% for hospital_type in hospital_types %}
+                                            <option value="{{ hospital_type.code }}" {% if record and record.additional_fields and record.additional_fields.hospital_type_code == hospital_type.code %}selected{% endif %}>
+                                                {{ hospital_type.name | localized_name(language) }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "ตำบล" if language == 'th' else "Sub-District" }}</label>
+                                        <select class="form-select" name="sub_district_code" id="sub_district_select">
+                                            <option value="">{{ "เลือกตำบล" if language == 'th' else "Select Sub-District" }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "ที่อยู่" if language == 'th' else "Address" }}</label>
+                                        <textarea class="form-control" name="address" rows="3">{{ record.additional_fields.address if record and record.additional_fields else '' }}</textarea>
+                                        <small class="form-hint">{{ "ที่อยู่ของโรงพยาบาล" if language == 'th' else "Hospital address" }}</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "รหัสไปรษณีย์" if language == 'th' else "Postal Code" }}</label>
+                                        <input type="text" class="form-control" name="postal_code" value="{{ record.additional_fields.postal_code if record and record.additional_fields else '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "เบอร์โทรศัพท์" if language == 'th' else "Phone" }}</label>
+                                        <input type="tel" class="form-control" name="phone" value="{{ record.additional_fields.phone if record and record.additional_fields else '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ "อีเมล" if language == 'th' else "Email" }}</label>
+                                        <input type="email" class="form-control" name="email" value="{{ record.additional_fields.email if record and record.additional_fields else '' }}">
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-end">
+                            <div class="d-flex">
+                                <a href="/admin/master-data/{{ data_type }}" class="btn btn-link">{{ "ยกเลิก" if language == 'th' else "Cancel" }}</a>
+                                <button type="submit" class="btn btn-primary ms-auto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"/>
+                                        <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                        <path d="M14 4l0 4l-6 0l0 -4"/>
+                                    </svg>
+                                    {{ "บันทึก" if language == 'th' else "Save" }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle cascading dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+    const provinceSelect = document.getElementById('province_select');
+    const districtSelect = document.getElementById('district_select');
+    const subDistrictSelect = document.getElementById('sub_district_select');
+    
+    if (provinceSelect && districtSelect) {
+        provinceSelect.addEventListener('change', function() {
+            const provinceCode = this.value;
+            
+            // Clear district options
+            districtSelect.innerHTML = '<option value="">{{ "เลือกอำเภอ" if language == "th" else "Select District" }}</option>';
+            if (subDistrictSelect) {
+                subDistrictSelect.innerHTML = '<option value="">{{ "เลือกตำบล" if language == "th" else "Select Sub-District" }}</option>';
+            }
+            
+            if (provinceCode) {
+                // Fetch districts for selected province
+                fetch(`/admin/api/master-data/districts/${provinceCode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            data.data.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.code;
+                                const lang = '{{ language }}';
+                                option.textContent = lang === 'th' ? district.name.th : district.name.en;
+                                districtSelect.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching districts:', error));
+            }
+        });
+    }
+    
+    if (districtSelect && subDistrictSelect) {
+        districtSelect.addEventListener('change', function() {
+            const districtCode = this.value;
+            
+            // Clear sub-district options
+            subDistrictSelect.innerHTML = '<option value="">{{ "เลือกตำบล" if language == "th" else "Select Sub-District" }}</option>';
+            
+            if (districtCode) {
+                // Fetch sub-districts for selected district
+                fetch(`/admin/api/master-data/sub-districts/${districtCode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            data.data.forEach(subDistrict => {
+                                const option = document.createElement('option');
+                                option.value = subDistrict.code;
+                                const lang = '{{ language }}';
+                                option.textContent = lang === 'th' ? subDistrict.name.th : subDistrict.name.en;
+                                subDistrictSelect.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching sub-districts:', error));
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
