@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Audit Logs
+                </h2>
+                <div class="page-subtitle">FHIR R5 Provenance Resources</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Action
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?action=">All Actions</a></li>
+                            <li><a class="dropdown-item" href="?action=CREATE">Create</a></li>
+                            <li><a class="dropdown-item" href="?action=UPDATE">Update</a></li>
+                            <li><a class="dropdown-item" href="?action=DELETE">Delete</a></li>
+                            <li><a class="dropdown-item" href="?action=READ">Read</a></li>
+                        </ul>
+                    </div>
+                    <a href="#" class="btn btn-primary" onclick="location.reload()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
+                        Refresh
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                </div>
+                <div>{{ error }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row row-cards">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">System Audit Logs</h3>
+                        <div class="card-actions">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="Search logs..." id="search-input">
+                                <button class="btn" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Resource Type</th>
+                                    <th>Action</th>
+                                    <th>Agent</th>
+                                    <th>Target</th>
+                                    <th>Details</th>
+                                    <th class="w-1">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if logs %}
+                                    {% for log in logs %}
+                                    <tr>
+                                        <td class="text-muted">
+                                            {{ log.recorded.strftime('%Y-%m-%d %H:%M:%S') if log.recorded else 'N/A' }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-blue">{{ log.resourceType or 'Provenance' }}</span>
+                                        </td>
+                                        <td>
+                                            {% if log.activity %}
+                                                {% if log.activity.code == 'CREATE' %}
+                                                <span class="badge bg-green">CREATE</span>
+                                                {% elif log.activity.code == 'UPDATE' %}
+                                                <span class="badge bg-yellow">UPDATE</span>
+                                                {% elif log.activity.code == 'DELETE' %}
+                                                <span class="badge bg-red">DELETE</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">{{ log.activity.code }}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">UNKNOWN</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if log.agent and log.agent|length > 0 %}
+                                                <div class="d-flex align-items-center">
+                                                    {% if log.agent[0].type.text == 'device' %}
+                                                    <span class="avatar avatar-sm me-2 bg-orange text-white">D</span>
+                                                    {% else %}
+                                                    <span class="avatar avatar-sm me-2 bg-blue text-white">U</span>
+                                                    {% endif %}
+                                                    <div>
+                                                        <div class="font-weight-medium">{{ log.agent[0].type.text|title }}</div>
+                                                        <div class="text-muted">{{ log.agent[0].who.identifier.value[:12] if log.agent[0].who.identifier else 'N/A' }}</div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if log.target and log.target|length > 0 %}
+                                                <div>{{ log.target[0].type or 'Unknown' }}</div>
+                                                <div class="text-muted">{{ log.target[0].reference[:20] if log.target[0].reference else 'N/A' }}...</div>
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if log.entity and log.entity|length > 0 %}
+                                                {{ log.entity[0].what.identifier.value if log.entity[0].what.identifier else 'N/A' }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-list flex-nowrap">
+                                                <button class="btn btn-white btn-sm" onclick="viewLogDetails('{{ log.id }}')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/></svg>
+                                                    View
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 9l1 0"/><path d="M9 13l6 0"/><path d="M9 17l6 0"/></svg>
+                                            <p class="mt-2">No audit logs found</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple search functionality
+document.getElementById('search-input').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+// View log details function
+function viewLogDetails(logId) {
+    // This would typically open a modal with detailed FHIR JSON
+    alert('View details for log: ' + logId + '\n\nThis would show the complete FHIR Provenance resource in a modal.');
+}
+</script>
+{% endblock %}

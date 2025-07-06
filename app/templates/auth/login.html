@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Login - My FirstCare Opera Panel</title>
+    <!-- CSS files -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <style>
+      @import url('https://rsms.me/inter/inter.css');
+      :root {
+      	--tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+      }
+      body {
+      	font-feature-settings: "cv03", "cv04", "cv11";
+      	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      	min-height: 100vh;
+      }
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .brand-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        border-radius: 16px 16px 0 0;
+        padding: 2rem;
+        text-align: center;
+        color: white;
+      }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    
+    <div class="login-container">
+        <div class="container container-tight">
+            <div class="login-card" style="max-width: 420px; margin: 0 auto;">
+                <!-- Brand Header -->
+                <div class="brand-header">
+                    <div class="mb-3">
+                        <img src="/static/LOGO_MFC_EN.png" height="60" alt="My FirstCare" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                    </div>
+                    <h2 class="mb-2">Opera Panel</h2>
+                    <p class="mb-0 opacity-75">Healthcare Management System</p>
+                </div>
+                
+                <!-- Login Form -->
+                <div class="card-body p-4">
+                    {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                            </div>
+                            <div>
+                                {{ error }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <form id="loginForm" autocomplete="off" novalidate="">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="Your username" autocomplete="username" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">
+                                Password
+                            </label>
+                            <div class="input-group input-group-flat">
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Your password" autocomplete="current-password" required>
+                                <span class="input-group-text">
+                                    <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/></svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-footer">
+                            <button type="submit" class="btn btn-primary w-100" id="loginButton">Sign in</button>
+                        </div>
+                    </form>
+                    
+                    <!-- Fallback form for browsers with JavaScript issues -->
+                    <form action="/auth/login-form" method="post" class="mt-2" style="display: none;" id="fallbackForm">
+                        <input type="hidden" name="username" id="fallbackUsername">
+                        <input type="hidden" name="password" id="fallbackPassword">
+                        <button type="submit" class="btn btn-outline-secondary w-100">Use Traditional Login</button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <a href="#" onclick="showFallbackForm()" class="text-muted small">Having trouble? Try traditional login</a>
+                    </div>
+                </div>
+                
+                <!-- Footer in Login -->
+                <div class="text-center mt-4 mb-3">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <img src="/static/AMY_LOGO.png" height="20" alt="A Medical For You" class="me-2 opacity-75">
+                        <span class="small text-white opacity-75">Powered by A Medical For You Co., Ltd.</span>
+                    </div>
+                    <div class="small text-white opacity-50">
+                        Copyright © 2023-2025 A Medical For You Co., Ltd. Bangkok Thailand
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const loginButton = document.getElementById('loginButton');
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        // Disable button and show loading state
+        loginButton.disabled = true;
+        loginButton.innerHTML = 'Signing in...';
+        
+        console.log('Attempting login for:', username);
+        
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+                credentials: 'same-origin'  // Ensure cookies are included
+            });
+            
+            console.log('Login response status:', response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Login successful:', data);
+                
+                // Show success message briefly
+                loginButton.innerHTML = 'Success! Redirecting...';
+                loginButton.className = 'btn btn-success w-100';
+                
+                // Multiple redirect strategies for compatibility
+                setTimeout(() => {
+                    console.log('Redirecting to dashboard...');
+                    try {
+                        window.location.href = '/';
+                    } catch (err) {
+                        console.error('Redirect failed:', err);
+                        // Fallback: try replace
+                        window.location.replace('/');
+                    }
+                }, 500);
+            } else {
+                const errorData = await response.json();
+                // Show error message
+                let errorMsg = 'Login failed. Please check your credentials.';
+                if (errorData.detail) {
+                    errorMsg = errorData.detail;
+                }
+                
+                // Show error alert
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger';
+                alertDiv.setAttribute('role', 'alert');
+                alertDiv.innerHTML = `
+                    <div class="d-flex">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                        </div>
+                        <div>
+                            ${errorMsg}
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing error alerts
+                const existingAlerts = document.querySelectorAll('.alert-danger');
+                existingAlerts.forEach(alert => alert.remove());
+                
+                // Insert new error alert
+                const form = document.getElementById('loginForm');
+                form.parentNode.insertBefore(alertDiv, form);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login. Please try again.');
+        } finally {
+            // Re-enable button
+            loginButton.disabled = false;
+            loginButton.innerHTML = 'Sign in';
+            loginButton.className = 'btn btn-primary w-100';
+        }
+    });
+    
+    function showFallbackForm() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        if (!username || !password) {
+            alert('Please enter your username and password first.');
+            return;
+        }
+        
+        document.getElementById('fallbackUsername').value = username;
+        document.getElementById('fallbackPassword').value = password;
+        document.getElementById('fallbackForm').style.display = 'block';
+    }
+    </script>
+</body>
+</html>

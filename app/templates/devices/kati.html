@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Kati Watch Management
+                </h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-kati">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg>
+                        Add Kati Device
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                </div>
+                <div>{{ error }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Device Statistics -->
+        <div class="row row-cards mb-3">
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Total Devices</div>
+                            <div class="ms-auto lh-1">
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle text-muted" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last 7 days</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h1 mb-3">{{ devices|length }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Active Devices</div>
+                        </div>
+                        <div class="h1 mb-3">
+                            {% set active_count = devices|selectattr("status", "equalto", "online")|list|length %}
+                            {{ active_count }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Assigned Devices</div>
+                        </div>
+                        <div class="h1 mb-3">
+                            {% set assigned_count = devices|selectattr("patient_id", "defined")|list|length %}
+                            {{ assigned_count }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Offline Devices</div>
+                        </div>
+                        <div class="h1 mb-3">
+                            {% set offline_count = devices|selectattr("status", "equalto", "offline")|list|length %}
+                            {{ offline_count }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cards">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Kati Watch Devices</h3>
+                        <div class="card-actions">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="Search devices..." id="search-input">
+                                <button class="btn" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>IMEI</th>
+                                    <th>Device Name</th>
+                                    <th>Patient</th>
+                                    <th>Status</th>
+                                    <th>Battery</th>
+                                    <th>Last Seen</th>
+                                    <th>Location</th>
+                                    <th class="w-1">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if devices %}
+                                    {% for device in devices %}
+                                    <tr>
+                                        <td class="text-muted">{{ device.imei }}</td>
+                                        <td>
+                                            <div class="d-flex py-1 align-items-center">
+                                                <span class="avatar me-2 bg-blue text-white">K</span>
+                                                <div class="flex-fill">
+                                                    <div class="font-weight-medium">{{ device.device_name or device.imei[:8] + "..." }}</div>
+                                                    <div class="text-muted">{{ device.firmware_version or 'N/A' }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if device.patient_id %}
+                                                <span class="badge bg-green">Assigned</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Unassigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if device.status == "online" %}
+                                            <span class="badge bg-success">Online</span>
+                                            {% elif device.status == "offline" %}
+                                            <span class="badge bg-danger">Offline</span>
+                                            {% else %}
+                                            <span class="badge bg-warning">{{ device.status|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if device.battery_level %}
+                                                <div class="row align-items-center">
+                                                    <div class="col-auto">{{ device.battery_level }}%</div>
+                                                    <div class="col">
+                                                        <div class="progress progress-xs">
+                                                            <div class="progress-bar" style="width: {{ device.battery_level }}%" 
+                                                                 role="progressbar" aria-valuenow="{{ device.battery_level }}" 
+                                                                 aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if device.last_seen %}
+                                                {{ device.last_seen.strftime('%Y-%m-%d %H:%M') if device.last_seen else 'Never' }}
+                                            {% else %}
+                                                Never
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">{{ device.location or 'N/A' }}</td>
+                                        <td>
+                                            <div class="btn-list flex-nowrap">
+                                                <a href="#" class="btn btn-white btn-sm">View</a>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-bs-toggle="dropdown">Actions</button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">Edit</a>
+                                                        <a class="dropdown-item" href="#">Assign Patient</a>
+                                                        <a class="dropdown-item" href="#">View Data</a>
+                                                        <a class="dropdown-item text-danger" href="#">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 7v5l3 3"/><path d="M12 3a9 9 0 1 1 0 18a9 9 0 0 1 0 -18"/></svg>
+                                            <p class="mt-2">No Kati devices found</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Kati Device Modal -->
+<div class="modal modal-blur fade" id="modal-add-kati" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Kati Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/api/devices/kati" method="post">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Device ID</label>
+                                <input type="text" name="device_id" class="form-control" required>
+                                <div class="form-hint">Unique identifier for the device</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">IMEI</label>
+                                <input type="text" name="imei" class="form-control" required>
+                                <div class="form-hint">15-digit IMEI number</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Device Name (Optional)</label>
+                                <input type="text" name="device_name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <input type="text" name="location" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Hospital Assignment (Optional)</label>
+                                <select name="hospital_id" class="form-select">
+                                    <option value="">Assign later</option>
+                                    <!-- Hospital options will be populated -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Patient Assignment (Optional)</label>
+                                <select name="patient_id" class="form-select">
+                                    <option value="">Assign later</option>
+                                    <!-- Patient options will be populated -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn" data-bs-dismiss="modal">Cancel</a>
+                    <button type="submit" class="btn btn-primary ms-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg>
+                        Add Device
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple search functionality
+document.getElementById('search-input').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

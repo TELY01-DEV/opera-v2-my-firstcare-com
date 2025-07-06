@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Dashboard
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        <!-- Stats row -->
+        <div class="row row-deck row-cards">
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Total Patients</div>
+                        </div>
+                        <div class="h1 mb-3" id="patient-count">Loading...</div>
+                        <div class="d-flex mb-2">
+                            <div class="flex-1">
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-primary" style="width: 75%" role="progressbar"></div>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <span class="text-green d-inline-flex align-items-center lh-1">
+                                    5% <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 17l6 -6l4 4l8 -8"/><path d="M14 7l7 0l0 7"/></svg>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-muted">vs last month</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Active Devices</div>
+                        </div>
+                        <div class="h1 mb-3" id="device-count">Loading...</div>
+                        <div class="d-flex mb-2">
+                            <div class="flex-1">
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-green" style="width: 85%" role="progressbar"></div>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <span class="text-green d-inline-flex align-items-center lh-1">
+                                    12% <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 17l6 -6l4 4l8 -8"/><path d="M14 7l7 0l0 7"/></svg>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-muted">vs last month</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Vital Signs Today</div>
+                        </div>
+                        <div class="h1 mb-3" id="vitals-count">Loading...</div>
+                        <div class="d-flex mb-2">
+                            <div class="flex-1">
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-warning" style="width: 60%" role="progressbar"></div>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <span class="text-red d-inline-flex align-items-center lh-1">
+                                    -2% <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7l6 6l4 -4l8 8"/><path d="M14 17l7 0l0 -7"/></svg>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-muted">vs yesterday</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="subheader">Alerts</div>
+                        </div>
+                        <div class="h1 mb-3" id="alerts-count">Loading...</div>
+                        <div class="d-flex mb-2">
+                            <div class="flex-1">
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-red" style="width: 25%" role="progressbar"></div>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <span class="text-red d-inline-flex align-items-center lh-1">
+                                    3 active
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-muted">critical alerts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts row -->
+        <div class="row row-cards mt-3">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Vital Signs Trends</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="vitals-chart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Device Status</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="devices-chart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="row row-cards mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush" id="recent-activity">
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="status-dot status-dot-animated bg-green d-block"></span>
+                                    </div>
+                                    <div class="col text-truncate">
+                                        <strong>New patient registered</strong>
+                                        <div class="d-block text-muted text-truncate mt-n1">John Doe - ID: PAT001</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="text-muted">2 min ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="status-dot status-dot-animated bg-blue d-block"></span>
+                                    </div>
+                                    <div class="col text-truncate">
+                                        <strong>AVA4 device connected</strong>
+                                        <div class="d-block text-muted text-truncate mt-n1">Device MAC: AA:BB:CC:DD:EE:FF</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="text-muted">5 min ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load dashboard stats
+async function loadStats() {
+    try {
+        // Mock data - replace with actual API calls
+        document.getElementById('patient-count').textContent = '1,247';
+        document.getElementById('device-count').textContent = '89';
+        document.getElementById('vitals-count').textContent = '2,543';
+        document.getElementById('alerts-count').textContent = '3';
+        
+        // Initialize charts
+        initVitalsChart();
+        initDevicesChart();
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+function initVitalsChart() {
+    const ctx = document.getElementById('vitals-chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Heart Rate',
+                data: [72, 75, 80, 78, 82, 77, 74],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Blood Pressure',
+                data: [120, 118, 125, 122, 128, 115, 119],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+}
+
+function initDevicesChart() {
+    const ctx = document.getElementById('devices-chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['AVA4', 'Kati', 'Qube-Vital'],
+            datasets: [{
+                data: [45, 30, 14],
+                backgroundColor: [
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(255, 99, 132)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Load stats on page load
+document.addEventListener('DOMContentLoaded', loadStats);
+</script>
+{% endblock %}

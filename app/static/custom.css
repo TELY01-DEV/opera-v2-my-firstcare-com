@@ -1,0 +1,45 @@
+/* Custom styles for Opera Panel */
+
+:root {
+    --opera-primary: #0066cc;
+    --opera-secondary: #28a745;
+    --opera-warning: #ffc107;
+    --opera-danger: #dc3545;
+}
+
+.navbar-brand-image {
+    max-height: 32px;
+    width: auto;
+}
+
+.status-dot-online {
+    background-color: var(--opera-secondary) !important;
+}
+
+.status-dot-offline {
+    background-color: var(--opera-danger) !important;
+}
+
+.status-dot-maintenance {
+    background-color: var(--opera-warning) !important;
+}
+
+.device-card {
+    transition: transform 0.2s;
+}
+
+.device-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.vital-sign-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}

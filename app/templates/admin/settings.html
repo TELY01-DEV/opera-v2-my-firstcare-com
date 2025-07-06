@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    System Settings
+                </h2>
+                <div class="page-subtitle">Configure Opera Panel system settings</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-cards">
+            <!-- API Configuration -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">API Configuration</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Stardust API Base URL</label>
+                                    <input type="text" class="form-control" value="https://stardust.my-firstcare.com" readonly>
+                                    <div class="form-hint">Main data API endpoint</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Stardust Auth URL</label>
+                                    <input type="text" class="form-control" value="https://stardust-v1.my-firstcare.com" readonly>
+                                    <div class="form-hint">Authentication service endpoint</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Panel Host</label>
+                                    <input type="text" class="form-control" value="0.0.0.0" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Panel Port</label>
+                                    <input type="text" class="form-control" value="5055" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">System Status</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-2"></span>
+                                        <div>Stardust API</div>
+                                        <div class="ms-auto">
+                                            <div class="text-green">Connected</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-2"></span>
+                                        <div>Authentication</div>
+                                        <div class="ms-auto">
+                                            <div class="text-green">Active</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-warning me-2"></span>
+                                        <div>Debug Mode</div>
+                                        <div class="ms-auto">
+                                            <div class="text-yellow">Enabled</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-blue me-2"></span>
+                                        <div>Log Level</div>
+                                        <div class="ms-auto">
+                                            <div class="text-blue">INFO</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Preferences -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">User Preferences</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Theme</label>
+                            <select class="form-select">
+                                <option value="light" selected>Light</option>
+                                <option value="dark">Dark</option>
+                                <option value="auto">Auto</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Items per page</label>
+                            <select class="form-select">
+                                <option value="25">25</option>
+                                <option value="50" selected>50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-check">
+                                <input type="checkbox" class="form-check-input" checked>
+                                <span class="form-check-label">Show real-time notifications</span>
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-check">
+                                <input type="checkbox" class="form-check-input">
+                                <span class="form-check-label">Auto-refresh data</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary">Save Preferences</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Version Information -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Version Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Opera Panel Version</label>
+                            <div class="text-muted">v2.0.0</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">FastAPI Version</label>
+                            <div class="text-muted">{{ fastapi_version or 'Unknown' }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Python Version</label>
+                            <div class="text-muted">{{ python_version or 'Unknown' }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Updated</label>
+                            <div class="text-muted">{{ current_time.strftime('%Y-%m-%d %H:%M:%S') if current_time else 'Unknown' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Statistics -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">System Statistics</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="card card-sm">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <span class="bg-blue text-white avatar">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></svg>
+                                                </span>
+                                            </div>
+                                            <div class="col">
+                                                <div class="font-weight-medium">{{ patient_count or 0 }} Patients</div>
+                                                <div class="text-muted">Total registered</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="card card-sm">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <span class="bg-green text-white avatar">A</span>
+                                            </div>
+                                            <div class="col">
+                                                <div class="font-weight-medium">{{ ava4_count or 0 }} AVA4</div>
+                                                <div class="text-muted">Devices</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="card card-sm">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <span class="bg-orange text-white avatar">K</span>
+                                            </div>
+                                            <div class="col">
+                                                <div class="font-weight-medium">{{ kati_count or 0 }} Kati</div>
+                                                <div class="text-muted">Watches</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="card card-sm">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <span class="bg-purple text-white avatar">Q</span>
+                                            </div>
+                                            <div class="col">
+                                                <div class="font-weight-medium">{{ qube_count or 0 }} Qube-Vital</div>
+                                                <div class="text-muted">Monitors</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Settings page functionality could be added here
+console.log('Settings page loaded');
+</script>
+{% endblock %}
