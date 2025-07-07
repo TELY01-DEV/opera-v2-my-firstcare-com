@@ -237,11 +237,16 @@
                         {% endif %}
                                         {% if data_type in ['sub-districts', 'hospitals'] %}
                                         <td>
+                                            {% set district_found = false %}
                                             {% for district in districts %}
                                                 {% if district.code|string == record.district_code|string %}
                                                     {{ district.name | localized_name(language) }}
+                                                    {% set district_found = true %}
                                                 {% endif %}
                                             {% endfor %}
+                                            {% if not district_found %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
                                         </td>
                                         {% endif %}
                                         {% if data_type == 'hospitals' %}
