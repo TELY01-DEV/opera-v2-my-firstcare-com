@@ -289,6 +289,103 @@ async def master_data_edit_form(request: Request, data_type: str, record_id: str
     except HTTPException as e:
         return RedirectResponse(url=f"/admin/master-data/{data_type}?error=Failed to load record: {e.detail}")
 
+@router.get("/master-data/{data_type}/{record_id}", response_class=HTMLResponse)
+async def master_data_detail(request: Request, data_type: str, record_id: str):
+    """Detail view for master data record"""
+    user, auth_result = await _check_auth(request)
+    if not user:
+        return auth_result
+    
+    if data_type not in MASTER_DATA_TYPES:
+        raise HTTPException(status_code=404, detail="Master data type not found")
+    
+    token = auth_result
+    
+    try:
+        # Get the record
+        record = await stardust_api.get_master_data_record(token, data_type, record_id)
+        
+        # Get related data for context display
+        related_data = {}
+        
+        # For districts, get province info
+        if data_type == "districts" and record.get("province_code"):
+            try:
+                provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+                provinces = provinces_response.get("data", [])
+                province = next((p for p in provinces if p.get("code") == record.get("province_code")), None)
+                if province:
+                    related_data["province"] = province
+            except:
+                pass
+        
+        # For sub-districts, get district and province info
+        if data_type == "sub-districts":
+            try:
+                if record.get("district_code"):
+                    districts_response = await stardust_api.get_districts(token, 0, 1000)
+                    districts = districts_response.get("data", [])
+                    district = next((d for d in districts if d.get("code") == record.get("district_code")), None)
+                    if district:
+                        related_data["district"] = district
+                        
+                        if district.get("province_code"):
+                            provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+                            provinces = provinces_response.get("data", [])
+                            province = next((p for p in provinces if p.get("code") == district.get("province_code")), None)
+                            if province:
+                                related_data["province"] = province
+            except:
+                pass
+        
+        # For hospitals, get all location hierarchy and hospital type
+        if data_type == "hospitals":
+            try:
+                if record.get("hospital_type_code"):
+                    hospital_types_response = await stardust_api.get_hospital_types(token, 0, 1000)
+                    hospital_types = hospital_types_response.get("data", [])
+                    hospital_type = next((ht for ht in hospital_types if ht.get("code") == record.get("hospital_type_code")), None)
+                    if hospital_type:
+                        related_data["hospital_type"] = hospital_type
+                
+                # Get location hierarchy
+                if record.get("sub_district_code"):
+                    sub_districts_response = await stardust_api.get_sub_districts(token, 0, 1000)
+                    sub_districts = sub_districts_response.get("data", [])
+                    sub_district = next((sd for sd in sub_districts if sd.get("code") == record.get("sub_district_code")), None)
+                    if sub_district:
+                        related_data["sub_district"] = sub_district
+                        
+                        if sub_district.get("district_code"):
+                            districts_response = await stardust_api.get_districts(token, 0, 1000)
+                            districts = districts_response.get("data", [])
+                            district = next((d for d in districts if d.get("code") == sub_district.get("district_code")), None)
+                            if district:
+                                related_data["district"] = district
+                                
+                                if district.get("province_code"):
+                                    provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+                                    provinces = provinces_response.get("data", [])
+                                    province = next((p for p in provinces if p.get("code") == district.get("province_code")), None)
+                                    if province:
+                                        related_data["province"] = province
+            except:
+                pass
+        
+        return templates.TemplateResponse("admin/master_data/detail.html", {
+            "request": request,
+            "user": user,
+            "page_title": f"{MASTER_DATA_TYPES[data_type]['singular']} Detail",
+            "data_type": data_type,
+            "data_config": MASTER_DATA_TYPES[data_type],
+            "record": record,
+            "related_data": related_data,
+            "language": request.headers.get("Accept-Language", "en")[:2]
+        })
+        
+    except HTTPException as e:
+        return RedirectResponse(url=f"/admin/master-data/{data_type}?error=Failed to load record: {e.detail}")
+
 @router.post("/master-data/{data_type}")
 async def master_data_create(request: Request, data_type: str):
     """Create new master data record"""
