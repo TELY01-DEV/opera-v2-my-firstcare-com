@@ -390,7 +390,7 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
                     if hospital_type:
                         related_data["hospital_type"] = hospital_type
                 
-                # Get location hierarchy
+                # Try to get location hierarchy through sub_district_code first
                 if record.get("sub_district_code"):
                     sub_districts_response = await stardust_api.get_sub_districts(token, 0, 1000)
                     sub_districts = sub_districts_response.get("data", [])
@@ -414,7 +414,35 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
                                     province = next((p for p in provinces if str(p.get("code")) == str(district.get("province_code"))), None)
                                     if province:
                                         related_data["province"] = province
-            except:
+                
+                # If location hierarchy not found through sub_district, try direct district/province codes
+                if not related_data.get("district") and record.get("district_code"):
+                    districts_response = await stardust_api.get_districts(token, 0, 1000)
+                    districts = districts_response.get("data", [])
+                    # Use string comparison for robustness
+                    district = next((d for d in districts if str(d.get("code")) == str(record.get("district_code"))), None)
+                    if district:
+                        related_data["district"] = district
+                        
+                        if district.get("province_code"):
+                            provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+                            provinces = provinces_response.get("data", [])
+                            # Use string comparison for robustness
+                            province = next((p for p in provinces if str(p.get("code")) == str(district.get("province_code"))), None)
+                            if province:
+                                related_data["province"] = province
+                
+                # If still no province, try direct province code
+                if not related_data.get("province") and record.get("province_code"):
+                    provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+                    provinces = provinces_response.get("data", [])
+                    # Use string comparison for robustness
+                    province = next((p for p in provinces if str(p.get("code")) == str(record.get("province_code"))), None)
+                    if province:
+                        related_data["province"] = province
+                        
+            except Exception as e:
+                print(f"Error in hospital location lookup: {e}")
                 pass
         
         return templates.TemplateResponse("admin/master_data/detail.html", {

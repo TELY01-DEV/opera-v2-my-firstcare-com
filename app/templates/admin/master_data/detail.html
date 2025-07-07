@@ -470,6 +470,351 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Hospital Operational Details -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ "ข้อมูลการดำเนินงาน" if language == 'th' else "Operational Details" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="datagrid">
+                            {% if record.en_name %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "ชื่อภาษาอังกฤษ" if language == 'th' else "English Name" }}</div>
+                                <div class="datagrid-content">{{ record.en_name }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.organizecode %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "รหัสองค์กร" if language == 'th' else "Organization Code" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-purple">{{ record.organizecode }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.hospital_area_code %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "รหัสพื้นที่โรงพยาบาล" if language == 'th' else "Hospital Area Code" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-cyan">{{ record.hospital_area_code }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.bed_capacity %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "จำนวนเตียง" if language == 'th' else "Bed Capacity" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-orange">{{ record.bed_capacity }} {{ "เตียง" if language == 'th' else "beds" }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.service_plan_type %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "แผนบริการ" if language == 'th' else "Service Plan Type" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-lime">{{ record.service_plan_type }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.image_url %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "รูปภาพ" if language == 'th' else "Image" }}</div>
+                                <div class="datagrid-content">
+                                    <a href="{{ record.image_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M15 8h.01"/>
+                                            <path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z"/>
+                                            <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5"/>
+                                            <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"/>
+                                        </svg>
+                                        {{ "ดูรูปภาพ" if language == 'th' else "View Image" }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.location and record.location|length == 2 %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "พิกัด GPS" if language == 'th' else "GPS Coordinates" }}</div>
+                                <div class="datagrid-content">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <strong>{{ "ละติจูด" if language == 'th' else "Lat" }}:</strong> {{ record.location[0] }}
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>{{ "ลองจิจูด" if language == 'th' else "Lng" }}:</strong> {{ record.location[1] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Integration & Notifications -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ "การแจ้งเตือนและระบบ" if language == 'th' else "System Integration & Notifications" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- LINE Integration -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">{{ "ระบบ LINE" if language == 'th' else "LINE Integration" }}</h5>
+                                <div class="datagrid">
+                                    {% if record.auto_login_liff_id %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">Auto Login LIFF ID</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.auto_login_liff_id }}</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.disconnect_liff_id %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">Disconnect LIFF ID</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.disconnect_liff_id }}</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.login_liff_id %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">Login LIFF ID</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.login_liff_id }}</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.rich_menu_token %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">Rich Menu Token</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.rich_menu_token }}</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.notifyToken %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">{{ "LINE Notify Token" if language == 'th' else "LINE Notify Token" }}</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.notifyToken[:20] }}...</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- System Configuration -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">{{ "การตั้งค่าระบบ" if language == 'th' else "System Configuration" }}</h5>
+                                <div class="datagrid">
+                                    {% if record.mac_hv01_box %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">MAC HV01 Box</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.mac_hv01_box }}</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.telegram_Token %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">Telegram Token</div>
+                                        <div class="datagrid-content">
+                                            <code>{{ record.telegram_Token[:20] }}...</code>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_default_value is defined %}
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">{{ "ใช้ค่าเริ่มต้น" if language == 'th' else "Use Default Values" }}</div>
+                                        <div class="datagrid-content">
+                                            {% if record.is_default_value %}
+                                                <span class="badge bg-green">{{ "เปิดใช้งาน" if language == 'th' else "Enabled" }}</span>
+                                            {% else %}
+                                                <span class="badge bg-red">{{ "ปิดใช้งาน" if language == 'th' else "Disabled" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ "การตั้งค่าการแจ้งเตือน" if language == 'th' else "Notification Settings" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- General Notifications -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">{{ "การแจ้งเตือนทั่วไป" if language == 'th' else "General Notifications" }}</h5>
+                                <div class="list-group list-group-flush">
+                                    {% if record.is_acknowledge is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "การยืนยัน" if language == 'th' else "Acknowledgment" }}
+                                        {% if record.is_acknowledge %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_admit_discard is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "รับ/จำหน่ายผู้ป่วย" if language == 'th' else "Admit/Discharge" }}
+                                        {% if record.is_admit_discard %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_status_change is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "เปลี่ยนสถานะ" if language == 'th' else "Status Change" }}
+                                        {% if record.is_status_change %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_line_notify is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "LINE Notify" if language == 'th' else "LINE Notify" }}
+                                        {% if record.is_line_notify %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_telegram_notify is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "Telegram Notify" if language == 'th' else "Telegram Notify" }}
+                                        {% if record.is_telegram_notify %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Medical Data Monitoring -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">{{ "การติดตามข้อมูลทางการแพทย์" if language == 'th' else "Medical Data Monitoring" }}</h5>
+                                <div class="list-group list-group-flush">
+                                    {% if record.is_body_data is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "ข้อมูลร่างกาย" if language == 'th' else "Body Data" }}
+                                        {% if record.is_body_data %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_lab_data is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "ข้อมูลแล็บ" if language == 'th' else "Lab Data" }}
+                                        {% if record.is_lab_data %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_vs_data is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "ข้อมูลสัญญาณชีพ" if language == 'th' else "Vital Signs Data" }}
+                                        {% if record.is_vs_data %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_vs_notify is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "แจ้งเตือนสัญญาณชีพ" if language == 'th' else "Vital Signs Notify" }}
+                                        {% if record.is_vs_notify %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_watch_data is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "ข้อมูลนาฬิกา" if language == 'th' else "Watch Data" }}
+                                        {% if record.is_watch_data %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_watch_notify is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "แจ้งเตือนนาฬิกา" if language == 'th' else "Watch Notify" }}
+                                        {% if record.is_watch_notify %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if record.is_watch_status_change is defined %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ "เปลี่ยนสถานะนาฬิกา" if language == 'th' else "Watch Status Change" }}
+                                        {% if record.is_watch_status_change %}
+                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
+                                        {% else %}
+                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
 
             {% if data_type == 'sub-districts' and record.postal_code %}
