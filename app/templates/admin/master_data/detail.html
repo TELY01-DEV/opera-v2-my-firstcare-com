@@ -279,7 +279,76 @@
                         </div>
                         {% endif %}
                         {% elif data_type == 'hospitals' %}
-                        <!-- Hospital location hierarchy would go here -->
+                        <!-- Hospital location hierarchy -->
+                        {% if related_data.province %}
+                        <div class="row align-items-center mb-3">
+                            <div class="col-auto">
+                                <span class="avatar bg-blue-lt">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="text-truncate">
+                                    <strong>{{ "จังหวัด" if language == 'th' else "Province" }}</strong>
+                                </div>
+                                <div class="text-muted">{{ related_data.province.name|localized_name(language) if related_data.province and related_data.province.name else 'N/A' }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge">{{ related_data.province.code if related_data.province else 'N/A' }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if related_data.district %}
+                        <div class="row align-items-center mb-3">
+                            <div class="col-auto">
+                                <span class="avatar bg-green-lt">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
+                                        <path d="M9 4v13"/>
+                                        <path d="M15 7v13"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="text-truncate">
+                                    <strong>{{ "อำเภอ" if language == 'th' else "District" }}</strong>
+                                </div>
+                                <div class="text-muted">{{ related_data.district.name|localized_name(language) if related_data.district and related_data.district.name else 'N/A' }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge">{{ related_data.district.code if related_data.district else 'N/A' }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if related_data.sub_district %}
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="avatar bg-yellow-lt">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"/>
+                                        <path d="M12 12l8 -4.5"/>
+                                        <path d="M12 12l0 9"/>
+                                        <path d="M12 12l-8 -4.5"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="text-truncate">
+                                    <strong>{{ "ตำบล" if language == 'th' else "Sub-district" }}</strong>
+                                </div>
+                                <div class="text-muted">{{ related_data.sub_district.name|localized_name(language) if related_data.sub_district and related_data.sub_district.name else 'N/A' }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge">{{ related_data.sub_district.code if related_data.sub_district else 'N/A' }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -300,6 +369,36 @@
                                 <div class="datagrid-title">{{ "ประเภทโรงพยาบาล" if language == 'th' else "Hospital Type" }}</div>
                                 <div class="datagrid-content">
                                     <span class="badge bg-azure">{{ record.hospital_type_code }}</span>
+                                    {% if related_data.hospital_type and related_data.hospital_type.name %}
+                                    <div class="mt-1 text-muted small">{{ related_data.hospital_type.name|localized_name(language) }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.province_code %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "รหัสจังหวัด" if language == 'th' else "Province Code" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-blue">{{ record.province_code }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.district_code %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "รหัสอำเภอ" if language == 'th' else "District Code" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-green">{{ record.district_code }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.sub_district_code %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "รหัสตำบล" if language == 'th' else "Sub-district Code" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-yellow">{{ record.sub_district_code }}</span>
                                 </div>
                             </div>
                             {% endif %}
@@ -326,6 +425,36 @@
                                 <div class="datagrid-content">
                                     <a href="mailto:{{ record.email }}" class="text-reset">{{ record.email }}</a>
                                 </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.fax %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "แฟกซ์" if language == 'th' else "Fax" }}</div>
+                                <div class="datagrid-content">{{ record.fax }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.website %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "เว็บไซต์" if language == 'th' else "Website" }}</div>
+                                <div class="datagrid-content">
+                                    <a href="{{ record.website if record.website.startswith('http') else 'https://' + record.website }}" target="_blank" class="text-reset">{{ record.website }}</a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.latitude %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "ละติจูด" if language == 'th' else "Latitude" }}</div>
+                                <div class="datagrid-content">{{ record.latitude }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.longitude %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "ลองจิจูด" if language == 'th' else "Longitude" }}</div>
+                                <div class="datagrid-content">{{ record.longitude }}</div>
                             </div>
                             {% endif %}
 

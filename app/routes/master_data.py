@@ -385,7 +385,8 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
                 if record.get("hospital_type_code"):
                     hospital_types_response = await stardust_api.get_hospital_types(token, 0, 1000)
                     hospital_types = hospital_types_response.get("data", [])
-                    hospital_type = next((ht for ht in hospital_types if ht.get("code") == record.get("hospital_type_code")), None)
+                    # Use string comparison for robustness
+                    hospital_type = next((ht for ht in hospital_types if str(ht.get("code")) == str(record.get("hospital_type_code"))), None)
                     if hospital_type:
                         related_data["hospital_type"] = hospital_type
                 
@@ -393,21 +394,24 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
                 if record.get("sub_district_code"):
                     sub_districts_response = await stardust_api.get_sub_districts(token, 0, 1000)
                     sub_districts = sub_districts_response.get("data", [])
-                    sub_district = next((sd for sd in sub_districts if sd.get("code") == record.get("sub_district_code")), None)
+                    # Use string comparison for robustness
+                    sub_district = next((sd for sd in sub_districts if str(sd.get("code")) == str(record.get("sub_district_code"))), None)
                     if sub_district:
                         related_data["sub_district"] = sub_district
                         
                         if sub_district.get("district_code"):
                             districts_response = await stardust_api.get_districts(token, 0, 1000)
                             districts = districts_response.get("data", [])
-                            district = next((d for d in districts if d.get("code") == sub_district.get("district_code")), None)
+                            # Use string comparison for robustness
+                            district = next((d for d in districts if str(d.get("code")) == str(sub_district.get("district_code"))), None)
                             if district:
                                 related_data["district"] = district
                                 
                                 if district.get("province_code"):
                                     provinces_response = await stardust_api.get_provinces(token, 0, 1000)
                                     provinces = provinces_response.get("data", [])
-                                    province = next((p for p in provinces if p.get("code") == district.get("province_code")), None)
+                                    # Use string comparison for robustness
+                                    province = next((p for p in provinces if str(p.get("code")) == str(district.get("province_code"))), None)
                                     if province:
                                         related_data["province"] = province
             except:
