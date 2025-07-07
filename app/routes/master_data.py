@@ -114,7 +114,7 @@ async def master_data_index(request: Request):
 
 @router.get("/master-data/{data_type}", response_class=HTMLResponse)
 async def master_data_list(request: Request, data_type: str, page: int = 1, search: Optional[str] = None,
-                          province_code: Optional[int] = None, district_code: Optional[int] = None):
+                          province_code: Optional[str] = None, district_code: Optional[str] = None):
     """List master data records"""
     user, auth_result = await _check_auth(request)
     if not user:
@@ -127,10 +127,26 @@ async def master_data_list(request: Request, data_type: str, page: int = 1, sear
     limit = 20
     skip = (page - 1) * limit
     
+    # Convert string parameters to integers, handling empty strings
+    province_code_int = None
+    district_code_int = None
+    
+    if province_code and province_code.strip():
+        try:
+            province_code_int = int(province_code)
+        except ValueError:
+            pass  # Keep as None if conversion fails
+            
+    if district_code and district_code.strip():
+        try:
+            district_code_int = int(district_code)
+        except ValueError:
+            pass  # Keep as None if conversion fails
+    
     try:
         # Fetch data from Stardust API
         data_response = await stardust_api.get_master_data(
-            token, data_type, skip, limit, search, province_code, district_code
+            token, data_type, skip, limit, search, province_code_int, district_code_int
         )
         
         # Get reference data for dropdowns
@@ -142,8 +158,8 @@ async def master_data_list(request: Request, data_type: str, page: int = 1, sear
             provinces_response = await stardust_api.get_provinces(token, 0, 1000)
             provinces = provinces_response.get("data", [])
         
-        if data_type in ["sub-districts", "hospitals"] and province_code:
-            districts_response = await stardust_api.get_districts(token, 0, 1000, None, province_code)
+        if data_type in ["sub-districts", "hospitals"] and province_code_int:
+            districts_response = await stardust_api.get_districts(token, 0, 1000, None, province_code_int)
             districts = districts_response.get("data", [])
             
         if data_type == "hospitals":

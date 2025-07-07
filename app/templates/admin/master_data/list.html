@@ -175,7 +175,7 @@
                                     <th>{{ "ประเภท" if language == 'th' else "Type" }}</th>
                                     {% endif %}
                                     <th>{{ "สถานะ" if language == 'th' else "Status" }}</th>
-                                    <th>{{ "วันที่สร้าง" if language == 'th' else "Created" }}</th>
+                                    <th>{{ "วันที่อัปเดต" if language == 'th' else "Last Updated" }}</th>
                                     <th class="w-1">{{ "การดำเนินการ" if language == 'th' else "Actions" }}</th>
                                 </tr>
                             </thead>
@@ -240,8 +240,17 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if record.created_at %}
-                                            <span class="text-muted">{{ record.created_at[:10] if record.created_at else '-' }}</span>
+                                            {% set display_date = record.updated_at if record.updated_at else record.created_at %}
+                                            {% if display_date %}
+                                            <div>
+                                                <span class="text-muted">{{ display_date[:10] if display_date else '-' }}</span>
+                                                <small class="d-block text-muted">{{ display_date[11:19] if display_date and display_date|length > 10 else '' }}</small>
+                                                {% if record.updated_at %}
+                                                <small class="d-block text-success">{{ "อัปเดต" if language == 'th' else "Updated" }}</small>
+                                                {% else %}
+                                                <small class="d-block text-secondary">{{ "สร้าง" if language == 'th' else "Created" }}</small>
+                                                {% endif %}
+                                            </div>
                                             {% else %}
                                             <span class="text-muted">-</span>
                                             {% endif %}

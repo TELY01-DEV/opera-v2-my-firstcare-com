@@ -178,7 +178,12 @@ class StardustAPIService:
         
         endpoint = endpoint_mapping.get(data_type, f"/admin/master-data/{data_type}")
         
-        params: dict = {"skip": skip, "limit": limit}
+        params: dict = {
+            "skip": skip, 
+            "limit": limit,
+            "sort": "updated_at",  # Sort by last update time
+            "order": "desc"       # Most recent first
+        }
         if search:
             params["search"] = search
         if province_code:
