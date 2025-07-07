@@ -73,7 +73,7 @@
                             {% endif %}
                         {% endif %}
                         {% if record.created_at %}
-                        • {{ "สร้างเมื่อ" if language == 'th' else "Created" }} {{ record.created_at.strftime('%B %d, %Y') if record.created_at else '' }}
+                        • {{ "สร้างเมื่อ" if language == 'th' else "Created" }} {{ record.created_at[:10] if record.created_at else '' }}
                         {% endif %}
                     </div>
                 </div>
@@ -185,7 +185,7 @@
                             <div class="datagrid-item">
                                 <div class="datagrid-title">{{ "วันที่สร้าง" if language == 'th' else "Created Date" }}</div>
                                 <div class="datagrid-content">
-                                    <span class="text-muted">{{ record.created_at.strftime('%B %d, %Y at %I:%M %p') if record.created_at else 'N/A' }}</span>
+                                    <span class="text-muted">{{ record.created_at[:19].replace('T', ' ') if record.created_at else 'N/A' }}</span>
                                 </div>
                             </div>
                             {% endif %}
@@ -194,7 +194,7 @@
                             <div class="datagrid-item">
                                 <div class="datagrid-title">{{ "วันที่แก้ไข" if language == 'th' else "Updated Date" }}</div>
                                 <div class="datagrid-content">
-                                    <span class="text-muted">{{ record.updated_at.strftime('%B %d, %Y at %I:%M %p') if record.updated_at else 'N/A' }}</span>
+                                    <span class="text-muted">{{ record.updated_at[:19].replace('T', ' ') if record.updated_at else 'N/A' }}</span>
                                 </div>
                             </div>
                             {% endif %}
