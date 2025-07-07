@@ -200,20 +200,19 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-blue-lt">{{ record.code }}</span>
-                                        </td>
-                                        {% if data_type in ['districts', 'sub-districts', 'hospitals'] %}
-                                        <td>
-                                            {% for province in provinces %}
-                                                {% if province.code == record.province_code %}
-                                                    {{ province.name | localized_name(language) }}
-                                                {% endif %}
-                                            {% endfor %}
-                                        </td>
-                                        {% endif %}
+                                        </td>                        {% if data_type in ['districts', 'sub-districts', 'hospitals'] %}
+                        <td>
+                            {% for province in provinces %}
+                                {% if province.code|string == record.province_code|string %}
+                                    {{ province.name | localized_name(language) }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        {% endif %}
                                         {% if data_type in ['sub-districts', 'hospitals'] %}
                                         <td>
                                             {% for district in districts %}
-                                                {% if district.code == record.district_code %}
+                                                {% if district.code|string == record.district_code|string %}
                                                     {{ district.name | localized_name(language) }}
                                                 {% endif %}
                                             {% endfor %}
@@ -223,7 +222,7 @@
                                         <td>
                                             {% if record.additional_fields and record.additional_fields.hospital_type_code %}
                                                 {% for hospital_type in hospital_types %}
-                                                    {% if hospital_type.code == record.additional_fields.hospital_type_code %}
+                                                    {% if hospital_type.code|string == record.additional_fields.hospital_type_code|string %}
                                                         {{ hospital_type.name | localized_name(language) }}
                                                     {% endif %}
                                                 {% endfor %}
