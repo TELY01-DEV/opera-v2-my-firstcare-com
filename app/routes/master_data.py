@@ -349,10 +349,12 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
             try:
                 provinces_response = await stardust_api.get_provinces(token, 0, 1000)
                 provinces = provinces_response.get("data", [])
-                province = next((p for p in provinces if p.get("code") == record.get("province_code")), None)
+                # Use string comparison for robustness
+                province = next((p for p in provinces if str(p.get("code")) == str(record.get("province_code"))), None)
                 if province:
                     related_data["province"] = province
-            except:
+            except Exception as e:
+                print(f"Error loading province for district: {e}")
                 pass
         
         # For sub-districts, get district and province info
@@ -361,17 +363,20 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
                 if record.get("district_code"):
                     districts_response = await stardust_api.get_districts(token, 0, 1000)
                     districts = districts_response.get("data", [])
-                    district = next((d for d in districts if d.get("code") == record.get("district_code")), None)
+                    # Use string comparison for robustness
+                    district = next((d for d in districts if str(d.get("code")) == str(record.get("district_code"))), None)
                     if district:
                         related_data["district"] = district
                         
                         if district.get("province_code"):
                             provinces_response = await stardust_api.get_provinces(token, 0, 1000)
                             provinces = provinces_response.get("data", [])
-                            province = next((p for p in provinces if p.get("code") == district.get("province_code")), None)
+                            # Use string comparison for robustness
+                            province = next((p for p in provinces if str(p.get("code")) == str(district.get("province_code"))), None)
                             if province:
                                 related_data["province"] = province
-            except:
+            except Exception as e:
+                print(f"Error loading related data for sub-district: {e}")
                 pass
         
         # For hospitals, get all location hierarchy and hospital type
