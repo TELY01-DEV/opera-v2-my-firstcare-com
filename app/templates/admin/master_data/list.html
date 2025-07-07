@@ -76,12 +76,12 @@
                 <div class="card">
                     <div class="card-body">
                         <form method="GET" class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">{{ "ค้นหา" if language == 'th' else "Search" }}</label>
                                 <input type="text" class="form-control" name="search" value="{{ search or '' }}" placeholder="{{ 'ค้นหาชื่อหรือรหัส...' if language == 'th' else 'Search name or code...' }}">
                             </div>
                             {% if data_type in ['districts', 'sub-districts', 'hospitals'] %}
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">{{ "จังหวัด" if language == 'th' else "Province" }}</label>
                                 <select class="form-select" name="province_code" id="province_select">
                                     <option value="">{{ "เลือกจังหวัด" if language == 'th' else "Select Province" }}</option>
@@ -94,7 +94,7 @@
                             </div>
                             {% endif %}
                             {% if data_type in ['sub-districts', 'hospitals'] %}
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">{{ "อำเภอ" if language == 'th' else "District" }}</label>
                                 <select class="form-select" name="district_code" id="district_select">
                                     <option value="">{{ "เลือกอำเภอ" if language == 'th' else "Select District" }}</option>
@@ -106,7 +106,23 @@
                                 </select>
                             </div>
                             {% endif %}
-                            <div class="col-md-2 d-flex align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label">{{ "สถานะ" if language == 'th' else "Status" }}</label>
+                                <select class="form-select" name="is_active">
+                                    <option value="">{{ "ทั้งหมด" if language == 'th' else "All" }}</option>
+                                    <option value="true" {% if is_active == true %}selected{% endif %}>{{ "ใช้งาน" if language == 'th' else "Active" }}</option>
+                                    <option value="false" {% if is_active == false %}selected{% endif %}>{{ "ไม่ใช้งาน" if language == 'th' else "Inactive" }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">{{ "วันที่เริ่มต้น" if language == 'th' else "Date From" }}</label>
+                                <input type="date" class="form-control" name="date_from" value="{{ date_from or '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">{{ "วันที่สิ้นสุด" if language == 'th' else "Date To" }}</label>
+                                <input type="date" class="form-control" name="date_to" value="{{ date_to or '' }}">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -115,6 +131,16 @@
                                     </svg>
                                     {{ "ค้นหา" if language == 'th' else "Search" }}
                                 </button>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <a href="/admin/master-data/{{ data_type }}" class="btn btn-outline-secondary w-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>
+                                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
+                                    </svg>
+                                    {{ "รีเซ็ต" if language == 'th' else "Reset" }}
+                                </a>
                             </div>
                         </form>
                     </div>
@@ -331,7 +357,7 @@
                         <ul class="pagination m-0 ms-auto">
                             {% if page > 1 %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}{% if province_code %}&province_code={{ province_code }}{% endif %}{% if district_code %}&district_code={{ district_code }}{% endif %}">
+                                <a class="page-link" href="?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}{% if province_code %}&province_code={{ province_code }}{% endif %}{% if district_code %}&district_code={{ district_code }}{% endif %}{% if is_active is not none %}&is_active={{ is_active|lower }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                         <path d="M15 6l-6 6l6 6"/>
@@ -344,12 +370,12 @@
                                 {% if p == page %}
                                 <li class="page-item active"><a class="page-link" href="#">{{ p }}</a></li>
                                 {% elif p <= 5 or p > (total // limit) - 5 or (p >= page - 2 and p <= page + 2) %}
-                                <li class="page-item"><a class="page-link" href="?page={{ p }}{% if search %}&search={{ search }}{% endif %}{% if province_code %}&province_code={{ province_code }}{% endif %}{% if district_code %}&district_code={{ district_code }}{% endif %}">{{ p }}</a></li>
+                                <li class="page-item"><a class="page-link" href="?page={{ p }}{% if search %}&search={{ search }}{% endif %}{% if province_code %}&province_code={{ province_code }}{% endif %}{% if district_code %}&district_code={{ district_code }}{% endif %}{% if is_active is not none %}&is_active={{ is_active|lower }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ p }}</a></li>
                                 {% endif %}
                             {% endfor %}
                             {% if page * limit < total %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}{% if province_code %}&province_code={{ province_code }}{% endif %}{% if district_code %}&district_code={{ district_code }}{% endif %}">
+                                <a class="page-link" href="?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}{% if province_code %}&province_code={{ province_code }}{% endif %}{% if district_code %}&district_code={{ district_code }}{% endif %}{% if is_active is not none %}&is_active={{ is_active|lower }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
                                     {{ "ถัดไป" if language == 'th' else "next" }}
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
