@@ -165,7 +165,8 @@ class StardustAPIService:
     # Master Data operations
     async def get_master_data(self, token: str, data_type: str, skip: int = 0, limit: int = 100, 
                              search: Optional[str] = None, province_code: Optional[int] = None, 
-                             district_code: Optional[int] = None):
+                             district_code: Optional[int] = None, is_active: Optional[bool] = None,
+                             date_from: Optional[str] = None, date_to: Optional[str] = None):
         """Get master data by type"""
         # Map data types to actual Stardust endpoints (using working endpoints found)
         endpoint_mapping = {
@@ -190,6 +191,12 @@ class StardustAPIService:
             params["province_code"] = province_code
         if district_code:
             params["district_code"] = district_code
+        if is_active is not None:
+            params["is_active"] = is_active
+        if date_from:
+            params["date_from"] = date_from
+        if date_to:
+            params["date_to"] = date_to
         return await self._make_request("GET", endpoint, token, params=params)
 
     async def get_master_data_record(self, token: str, data_type: str, record_id: str):
