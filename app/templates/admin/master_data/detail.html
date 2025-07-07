@@ -211,7 +211,7 @@
                         <h3 class="card-title">{{ "ข้อมูลตำแหน่งที่ตั้ง" if language == 'th' else "Location Information" }}</h3>
                     </div>
                     <div class="card-body">
-                        {% if data_type == 'districts' and province_data %}
+                        {% if data_type == 'districts' and related_data.province %}
                         <div class="row align-items-center">
                             <div class="col-auto">
                                 <span class="avatar bg-blue-lt">
@@ -226,13 +226,14 @@
                                 <div class="text-truncate">
                                     <strong>{{ "จังหวัด" if language == 'th' else "Province" }}</strong>
                                 </div>
-                                <div class="text-muted">{{ province_data.name|localized_name(language) if province_data and province_data.name else 'N/A' }}</div>
+                                <div class="text-muted">{{ related_data.province.name|localized_name(language) if related_data.province and related_data.province.name else 'N/A' }}</div>
                             </div>
                             <div class="col-auto">
-                                <span class="badge">{{ province_data.code if province_data else 'N/A' }}</span>
+                                <span class="badge">{{ related_data.province.code if related_data.province else 'N/A' }}</span>
                             </div>
                         </div>
                         {% elif data_type == 'sub-districts' %}
+                        {% if related_data.province %}
                         <div class="row align-items-center mb-3">
                             <div class="col-auto">
                                 <span class="avatar bg-blue-lt">
@@ -247,13 +248,14 @@
                                 <div class="text-truncate">
                                     <strong>{{ "จังหวัด" if language == 'th' else "Province" }}</strong>
                                 </div>
-                                <div class="text-muted">{{ province_data.name|localized_name(language) if province_data and province_data.name else 'N/A' }}</div>
+                                <div class="text-muted">{{ related_data.province.name|localized_name(language) if related_data.province and related_data.province.name else 'N/A' }}</div>
                             </div>
                             <div class="col-auto">
-                                <span class="badge">{{ province_data.code if province_data else 'N/A' }}</span>
+                                <span class="badge">{{ related_data.province.code if related_data.province else 'N/A' }}</span>
                             </div>
                         </div>
-                        {% if district_data %}
+                        {% endif %}
+                        {% if related_data.district %}
                         <div class="row align-items-center">
                             <div class="col-auto">
                                 <span class="avatar bg-green-lt">
@@ -269,10 +271,10 @@
                                 <div class="text-truncate">
                                     <strong>{{ "อำเภอ" if language == 'th' else "District" }}</strong>
                                 </div>
-                                <div class="text-muted">{{ district_data.name|localized_name(language) if district_data and district_data.name else 'N/A' }}</div>
+                                <div class="text-muted">{{ related_data.district.name|localized_name(language) if related_data.district and related_data.district.name else 'N/A' }}</div>
                             </div>
                             <div class="col-auto">
-                                <span class="badge">{{ district_data.code if district_data else 'N/A' }}</span>
+                                <span class="badge">{{ related_data.district.code if related_data.district else 'N/A' }}</span>
                             </div>
                         </div>
                         {% endif %}
