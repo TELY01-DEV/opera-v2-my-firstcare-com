@@ -183,7 +183,7 @@ class StardustAPIService:
             "skip": skip, 
             "limit": limit,
             "sort": "updated_at",  # Sort by last update time
-            "order": "desc"       # Most recent first
+            "order": "desc"       # Most recent first (try desc again)
         }
         if search:
             params["search"] = search

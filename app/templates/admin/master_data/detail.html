@@ -211,7 +211,190 @@
                         <h3 class="card-title">{{ "ข้อมูลตำแหน่งที่ตั้ง" if language == 'th' else "Location Information" }}</h3>
                     </div>
                     <div class="card-body">
-                        {% if data_type == 'districts' and related_data.province %}
+                        {% if data_type == 'hospitals' %}
+                        <!-- Hospital Address Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h5 class="mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-blue" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M12 6.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0 -5z"/>
+                                        <path d="M12 1v6"/>
+                                        <path d="M12 18v5"/>
+                                        <path d="M9 21h6"/>
+                                        <path d="M19 9h-7"/>
+                                        <path d="M5 9h7"/>
+                                    </svg>
+                                    {{ "ที่อยู่โรงพยาบาล" if language == 'th' else "Hospital Address" }}
+                                </h5>
+                                
+                                <!-- Constructed Address -->
+                                {% if related_data.province or related_data.district or related_data.sub_district %}
+                                <div class="p-3 bg-light rounded mb-3 constructed-address">
+                                    <div class="address-text">
+                                        <div class="text-muted small mb-1">{{ "ที่อยู่ตามเขตการปกครอง" if language == 'th' else "Administrative Address" }}</div>
+                                        <div class="h6 mb-0">
+                                            {% if related_data.sub_district %}{{ related_data.sub_district.name|localized_name(language) }}{% endif %}
+                                            {% if related_data.district %}{% if related_data.sub_district %}, {% endif %}{{ related_data.district.name|localized_name(language) }}{% endif %}
+                                            {% if related_data.province %}{% if related_data.district or related_data.sub_district %}, {% endif %}{{ related_data.province.name|localized_name(language) }}{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Administrative Hierarchy -->
+                                {% if related_data.province %}
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-auto">
+                                        <span class="avatar bg-blue-lt">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                                <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-truncate">
+                                            <strong>{{ "จังหวัด" if language == 'th' else "Province" }}</strong>
+                                        </div>
+                                        <div class="text-muted">{{ related_data.province.name|localized_name(language) if related_data.province and related_data.province.name else 'N/A' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="badge">{{ related_data.province.code if related_data.province else 'N/A' }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if related_data.district %}
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-auto">
+                                        <span class="avatar bg-green-lt">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
+                                                <path d="M9 4v13"/>
+                                                <path d="M15 7v13"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-truncate">
+                                            <strong>{{ "อำเภอ" if language == 'th' else "District" }}</strong>
+                                        </div>
+                                        <div class="text-muted">{{ related_data.district.name|localized_name(language) if related_data.district and related_data.district.name else 'N/A' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="badge">{{ related_data.district.code if related_data.district else 'N/A' }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if related_data.sub_district %}
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="avatar bg-yellow-lt">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"/>
+                                                <path d="M12 12l8 -4.5"/>
+                                                <path d="M12 12l0 9"/>
+                                                <path d="M12 12l-8 -4.5"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-truncate">
+                                            <strong>{{ "ตำบล" if language == 'th' else "Sub-district" }}</strong>
+                                        </div>
+                                        <div class="text-muted">{{ related_data.sub_district.name|localized_name(language) if related_data.sub_district and related_data.sub_district.name else 'N/A' }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="badge">{{ related_data.sub_district.code if related_data.sub_district else 'N/A' }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- GPS Coordinates Section -->
+                            <div class="col-md-4">
+                                {% if record.location and record.location|length == 2 %}
+                                <h5 class="mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-green" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M12 2l-1.5 4.5l-4.5 1.5l4.5 1.5l1.5 4.5l1.5 -4.5l4.5 -1.5l-4.5 -1.5z"/>
+                                    </svg>
+                                    {{ "พิกัด GPS" if language == 'th' else "GPS Coordinates" }}
+                                </h5>
+                                
+                                <!-- Coordinates Display -->
+                                <div class="row g-2 mb-3 coordinates-display">
+                                    <div class="col-12">
+                                        <div class="p-3 border rounded bg-white">
+                                            <div class="text-muted small mb-1">{{ "ละติจูด (Latitude)" if language == 'th' else "Latitude" }}</div>
+                                            <div class="h5 mb-0 text-primary latitude-value">{{ record.location[0] }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 border rounded bg-white">
+                                            <div class="text-muted small mb-1">{{ "ลองจิจูด (Longitude)" if language == 'th' else "Longitude" }}</div>
+                                            <div class="h5 mb-0 text-success longitude-value">{{ record.location[1] }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Actions -->
+                                <div class="row g-2">
+                                    <div class="col-12 mb-2">
+                                        <button type="button" id="editLocationBtn" class="btn btn-warning w-100 btn-sm" onclick="toggleEditMode()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                                                <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                                                <path d="M16 5l3 3"/>
+                                            </svg>
+                                            {{ "แก้ไขตำแหน่ง" if language == 'th' else "Edit Location" }}
+                                        </button>
+                                        <button type="button" id="saveLocationBtn" class="btn btn-success w-100 btn-sm" onclick="saveLocationUpdate()" style="display: none;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 12l5 5l10 -10"/>
+                                            </svg>
+                                            {{ "บันทึก" if language == 'th' else "Save" }}
+                                        </button>
+                                        <button type="button" id="cancelLocationBtn" class="btn btn-outline-secondary w-100 btn-sm mt-1" onclick="cancelLocationUpdate()" style="display: none;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M18 6l-12 12"/>
+                                                <path d="M6 6l12 12"/>
+                                            </svg>
+                                            {{ "ยกเลิก" if language == 'th' else "Cancel" }}
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-primary w-100 btn-sm" onclick="openGoogleMaps()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                                <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                            </svg>
+                                            {{ "เปิดแผนที่" if language == 'th' else "Open Map" }}
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-secondary w-100 btn-sm" onclick="copyCoordinates()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/>
+                                                <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                            </svg>
+                                            {{ "คัดลอก" if language == 'th' else "Copy" }}
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% elif data_type == 'districts' and related_data.province %}
                         <div class="row align-items-center">
                             <div class="col-auto">
                                 <span class="avatar bg-blue-lt">
@@ -240,7 +423,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                         <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
-                                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0l-4.243 4.243a1.996 1.996 0 0 1 -1.394 .585z"/>
                                     </svg>
                                 </span>
                             </div>
@@ -275,77 +458,6 @@
                             </div>
                             <div class="col-auto">
                                 <span class="badge">{{ related_data.district.code if related_data.district else 'N/A' }}</span>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% elif data_type == 'hospitals' %}
-                        <!-- Hospital location hierarchy -->
-                        {% if related_data.province %}
-                        <div class="row align-items-center mb-3">
-                            <div class="col-auto">
-                                <span class="avatar bg-blue-lt">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
-                                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="col">
-                                <div class="text-truncate">
-                                    <strong>{{ "จังหวัด" if language == 'th' else "Province" }}</strong>
-                                </div>
-                                <div class="text-muted">{{ related_data.province.name|localized_name(language) if related_data.province and related_data.province.name else 'N/A' }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <span class="badge">{{ related_data.province.code if related_data.province else 'N/A' }}</span>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% if related_data.district %}
-                        <div class="row align-items-center mb-3">
-                            <div class="col-auto">
-                                <span class="avatar bg-green-lt">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
-                                        <path d="M9 4v13"/>
-                                        <path d="M15 7v13"/>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="col">
-                                <div class="text-truncate">
-                                    <strong>{{ "อำเภอ" if language == 'th' else "District" }}</strong>
-                                </div>
-                                <div class="text-muted">{{ related_data.district.name|localized_name(language) if related_data.district and related_data.district.name else 'N/A' }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <span class="badge">{{ related_data.district.code if related_data.district else 'N/A' }}</span>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% if related_data.sub_district %}
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <span class="avatar bg-yellow-lt">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"/>
-                                        <path d="M12 12l8 -4.5"/>
-                                        <path d="M12 12l0 9"/>
-                                        <path d="M12 12l-8 -4.5"/>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="col">
-                                <div class="text-truncate">
-                                    <strong>{{ "ตำบล" if language == 'th' else "Sub-district" }}</strong>
-                                </div>
-                                <div class="text-muted">{{ related_data.sub_district.name|localized_name(language) if related_data.sub_district and related_data.sub_district.name else 'N/A' }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <span class="badge">{{ related_data.sub_district.code if related_data.sub_district else 'N/A' }}</span>
                             </div>
                         </div>
                         {% endif %}
@@ -378,27 +490,36 @@
 
                             {% if record.province_code %}
                             <div class="datagrid-item">
-                                <div class="datagrid-title">{{ "รหัสจังหวัด" if language == 'th' else "Province Code" }}</div>
+                                <div class="datagrid-title">{{ "จังหวัด" if language == 'th' else "Province" }}</div>
                                 <div class="datagrid-content">
-                                    <span class="badge bg-blue">{{ record.province_code }}</span>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-blue me-2">{{ record.province_code }}</span>
+                                        <span>{{ related_data.province.name|localized_name(language) if related_data.province and related_data.province.name else 'N/A' }}</span>
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
 
                             {% if record.district_code %}
                             <div class="datagrid-item">
-                                <div class="datagrid-title">{{ "รหัสอำเภอ" if language == 'th' else "District Code" }}</div>
+                                <div class="datagrid-title">{{ "อำเภอ" if language == 'th' else "District" }}</div>
                                 <div class="datagrid-content">
-                                    <span class="badge bg-green">{{ record.district_code }}</span>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-green me-2">{{ record.district_code }}</span>
+                                        <span>{{ related_data.district.name|localized_name(language) if related_data.district and related_data.district.name else 'N/A' }}</span>
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
 
                             {% if record.sub_district_code %}
                             <div class="datagrid-item">
-                                <div class="datagrid-title">{{ "รหัสตำบล" if language == 'th' else "Sub-district Code" }}</div>
+                                <div class="datagrid-title">{{ "ตำบล" if language == 'th' else "Sub-district" }}</div>
                                 <div class="datagrid-content">
-                                    <span class="badge bg-yellow">{{ record.sub_district_code }}</span>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-yellow me-2">{{ record.sub_district_code }}</span>
+                                        <span>{{ related_data.sub_district.name|localized_name(language) if related_data.sub_district and related_data.sub_district.name else 'N/A' }}</span>
+                                    </div>
                                 </div>
                             </div>
                             {% endif %}
@@ -542,273 +663,429 @@
 
                             {% if record.location and record.location|length == 2 %}
                             <div class="datagrid-item">
-                                <div class="datagrid-title">{{ "พิกัด GPS" if language == 'th' else "GPS Coordinates" }}</div>
+                                <div class="datagrid-title">{{ "พิกัด GPS และแผนที่" if language == 'th' else "GPS Coordinates & Map" }}</div>
                                 <div class="datagrid-content">
-                                    <div class="row">
+                                    <!-- Coordinates Info -->
+                                    <div class="row mb-3">
                                         <div class="col-6">
-                                            <strong>{{ "ละติจูด" if language == 'th' else "Lat" }}:</strong> {{ record.location[0] }}
+                                            <div class="d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-blue" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M12 2l-1.5 4.5l-4.5 1.5l4.5 1.5l1.5 4.5l1.5 -4.5l4.5 -1.5l-4.5 -1.5z"/>
+                                                </svg>
+                                                <div>
+                                                    <small class="text-muted">{{ "ละติจูด" if language == 'th' else "Latitude" }}</small>
+                                                    <div class="fw-bold">{{ record.location[0] }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-6">
-                                            <strong>{{ "ลองจิจูด" if language == 'th' else "Lng" }}:</strong> {{ record.location[1] }}
+                                            <div class="d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-green" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M12 2l-1.5 4.5l-4.5 1.5l4.5 1.5l1.5 4.5l1.5 -4.5l4.5 -1.5l-4.5 -1.5z"/>
+                                                </svg>
+                                                <div>
+                                                    <small class="text-muted">{{ "ลองจิจูด" if language == 'th' else "Longitude" }}</small>
+                                                    <div class="fw-bold">{{ record.location[1] }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Map Container -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-light py-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                                    </svg>
+                                                    {{ "ตำแหน่งบนแผนที่" if language == 'th' else "Location on Map" }}
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="toggleMapType()">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
+                                                            <path d="M9 4v13"/>
+                                                            <path d="M15 7v13"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="centerMap()">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                            <path d="M12 1v6m0 6v6"/>
+                                                            <path d="M21 12h-6m-6 0h-6"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="fullscreenMap()">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M4 8V6a2 2 0 0 1 2-2h2"/>
+                                                            <path d="M4 16v2a2 2 0 0 0 2 2h2"/>
+                                                            <path d="M16 4h2a2 2 0 0 1 2 2v2"/>
+                                                            <path d="M16 20h2a2 2 0 0 0 2-2v-2"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div id="map" style="height: 350px; border-radius: 0 0 6px 6px;"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <button type="button" class="btn btn-primary w-100" onclick="openGoogleMaps()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                                    <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                                </svg>
+                                                {{ "เปิดใน Google Maps" if language == 'th' else "Open in Google Maps" }}
+                                            </button>
+                                        </div>
+                                        <div class="col-6">
+                                            <button type="button" class="btn btn-outline-secondary w-100" onclick="copyCoordinates()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/>
+                                                    <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                                </svg>
+                                                {{ "คัดลอกพิกัด" if language == 'th' else "Copy Coordinates" }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Edit and Save Buttons -->
+                                    <div class="row g-2 mt-3">
+                                        <div class="col-12">
+                                            <button type="button" class="btn btn-warning w-100" id="editLocationBtn" onclick="toggleEditMode()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                                                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                                                    <path d="M16 5l3 3"/>
+                                                </svg>
+                                                {{ "แก้ไขตำแหน่ง" if language == 'th' else "Edit Location" }}
+                                            </button>
+                                            <button type="button" class="btn btn-success w-100 d-none" id="saveLocationBtn" onclick="saveLocationUpdate()">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                {{ "บันทึกตำแหน่ง" if language == 'th' else "Save Location" }}
+                                            </button>
+                                            <button type="button" class="btn btn-secondary w-100 d-none" id="cancelLocationBtn" onclick="cancelLocationUpdate()">
+                                                {{ "ยกเลิก" if language == 'th' else "Cancel" }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GPS Coordinates & Map - Full Width Section -->
+            {% if data_type == 'hospitals' and record.location and record.location|length == 2 %}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ "พิกัด GPS และแผนที่ตำแหน่ง" if language == 'th' else "GPS Coordinates & Location Map" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Coordinates Info Header -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center p-3 border rounded bg-light">
+                                    <div class="avatar bg-blue text-white me-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M12 2l-1.5 4.5l-4.5 1.5l4.5 1.5l1.5 4.5l1.5 -4.5l4.5 -1.5l-4.5 -1.5z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small mb-1">{{ "ละติจูด (Latitude)" if language == 'th' else "Latitude" }}</div>
+                                        <div class="h4 mb-0">{{ record.location[0] }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center p-3 border rounded bg-light">
+                                    <div class="avatar bg-green text-white me-3"></div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M12 2l-1.5 4.5l-4.5 1.5l4.5 1.5l1.5 4.5l1.5 -4.5l4.5 -1.5l-4.5 -1.5z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small mb-1">{{ "ลองจิจูด (Longitude)" if language == 'th' else "Longitude" }}</div>
+                                        <div class="h4 mb-0">{{ record.location[1] }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Interactive Map Container -->
+                        <div class="card shadow-lg border-0">
+                            <div class="card-header bg-gradient-primary text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 d-flex align-items-center"></h5>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                            <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                        </svg>
+                                        {{ "แผนที่ตำแหน่งโรงพยาบาล" if language == 'th' else "Hospital Location Map" }}
+                                    </h5>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-light" onclick="toggleMapType()" title="{{ 'เปลี่ยนประเภทแผนที่' if language == 'th' else 'Toggle Map Type' }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
+                                                <path d="M9 4v13"/>
+                                                <path d="M15 7v13"/>
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-light" onclick="centerMap()" title="{{ 'กลับไปตำแหน่งกลาง' if language == 'th' else 'Center Map' }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                <path d="M12 1v6m0 6v6"/>
+                                                <path d="M21 12h-6m-6 0h-6"/>
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-light" onclick="fullscreenMap()" title="{{ 'เต็มหน้าจอ' if language == 'th' else 'Fullscreen' }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M4 8V6a2 2 0 0 1 2-2h2"/>
+                                                <path d="M4 16v2a2 2 0 0 0 2 2h2"/>
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v2"/>
+                                                <path d="M16 20h2a2 2 0 0 0 2-2v-2"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0 position-relative">
+                                <div id="mapFullWidth" style="height: 600px; width: 100%; border-radius: 0 0 12px 12px; position: relative;"></div>
+                                <!-- Map Loading Overlay -->
+                                <div id="mapLoadingOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75" style="z-index: 1000;">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary mb-2" role="status">
+                                            <span class="visually-hidden">{{ "กำลังโหลด..." if language == 'th' else "Loading..." }}</span>
+                                        </div>
+                                        <div class="text-muted">{{ "กำลังโหลดแผนที่..." if language == 'th' else "Loading map..." }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons & Info -->
+                        <div class="row mt-4">
+                            <div class="col-lg-8">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <button type="button" class="btn btn-primary w-100 btn-lg shadow-sm" onclick="openGoogleMaps()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                                                <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                                            </svg>
+                                            {{ "เปิดใน Google Maps" if language == 'th' else "Open in Google Maps" }}
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" class="btn btn-outline-primary w-100 btn-lg shadow-sm" onclick="getDirections()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M3 6h18"/>
+                                                <path d="M3 12h15l-3 -3"/>
+                                                <path d="M3 18h6l-3 -3"/>
+                                            </svg>
+                                            {{ "เส้นทาง" if language == 'th' else "Directions" }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-secondary w-100 shadow-sm" onclick="copyCoordinates()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/>
+                                                <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                            </svg>
+                                            {{ "คัดลอกพิกัด" if language == 'th' else "Copy Coordinates" }}
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-info w-100 shadow-sm" onclick="shareLocation()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                <path d="M8.7 10.7l6.6 -3.4"/>
+                                                <path d="M8.7 13.3l6.6 3.4"/>
+                                            </svg>
+                                            {{ "แชร์ตำแหน่ง" if language == 'th' else "Share Location" }}
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-success w-100 shadow-sm" onclick="searchNearby()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
+                                                <path d="m21 21l-6 -6"/>
+                                            </svg>
+                                            {{ "ค้นหาใกล้เคียง" if language == 'th' else "Search Nearby" }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <!-- Map Status Panel -->
+                                <div class="card bg-gradient-light h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-3 text-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-primary" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                                                <path d="M12 7v5l3 3"/>
+                                            </svg>
+                                            {{ "สถานะแผนที่" if language == 'th' else "Map Status" }}
+                                        </h6>
+                                        <div class="row text-center g-3">
+                                            <div class="col-12">
+                                                <div class="p-3 bg-white rounded border">
+                                                    <div class="text-muted small mb-1">{{ "ระดับการซูม" if language == 'th' else "Zoom Level" }}</div>
+                                                    <div class="h4 mb-0 text-primary" id="zoomLevelFull">15</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="p-3 bg-white rounded border">
+                                                    <div class="text-muted small mb-1">{{ "ประเภทแผนที่" if language == 'th' else "Map Type" }}</div>
+                                                    <div class="fw-bold text-info" id="mapTypeFull">{{ "ผสม" if language == 'th' else "Hybrid" }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="p-3 bg-white rounded border">
+                                                    <div class="text-muted small mb-1">{{ "สถานะ" if language == 'th' else "Status" }}</div>
+                                                    <div class="fw-bold" id="mapStatusFull">
+                                                        <span class="badge bg-warning">{{ "กำลังโหลด..." if language == 'th' else "Loading..." }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Technical & Raw Data Section -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ "ข้อมูลเทคนิคและ Raw Data" if language == 'th' else "Technical & Raw Data" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="datagrid">
+                            {% if record.mac_hv01_box %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">MAC HV01 Box</div>
+                                <div class="datagrid-content">
+                                    <code>{{ record.mac_hv01_box }}</code>
                                 </div>
                             </div>
                             {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- System Integration & Notifications -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ "การแจ้งเตือนและระบบ" if language == 'th' else "System Integration & Notifications" }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- LINE Integration -->
-                            <div class="col-md-6">
-                                <h5 class="mb-3">{{ "ระบบ LINE" if language == 'th' else "LINE Integration" }}</h5>
-                                <div class="datagrid">
-                                    {% if record.auto_login_liff_id %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">Auto Login LIFF ID</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.auto_login_liff_id }}</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.disconnect_liff_id %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">Disconnect LIFF ID</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.disconnect_liff_id }}</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.login_liff_id %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">Login LIFF ID</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.login_liff_id }}</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.rich_menu_token %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">Rich Menu Token</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.rich_menu_token }}</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.notifyToken %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">{{ "LINE Notify Token" if language == 'th' else "LINE Notify Token" }}</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.notifyToken[:20] }}...</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
+                            {% if record.notifyToken %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Notify Token</div>
+                                <div class="datagrid-content">
+                                    <code>{{ record.notifyToken }}</code>
                                 </div>
                             </div>
+                            {% endif %}
 
-                            <!-- System Configuration -->
-                            <div class="col-md-6">
-                                <h5 class="mb-3">{{ "การตั้งค่าระบบ" if language == 'th' else "System Configuration" }}</h5>
-                                <div class="datagrid">
-                                    {% if record.mac_hv01_box %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">MAC HV01 Box</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.mac_hv01_box }}</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
+                            {% if record._id %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Database ID</div>
+                                <div class="datagrid-content">
+                                    <code>{{ record._id }}</code>
+                                </div>
+                            </div>
+                            {% endif %}
 
-                                    {% if record.telegram_Token %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">Telegram Token</div>
-                                        <div class="datagrid-content">
-                                            <code>{{ record.telegram_Token[:20] }}...</code>
-                                        </div>
-                                    </div>
-                                    {% endif %}
+                            {% if record.__v is defined %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Document Version</div>
+                                <div class="datagrid-content">
+                                    <span class="badge bg-info">v{{ record.__v }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
 
-                                    {% if record.is_default_value is defined %}
-                                    <div class="datagrid-item">
-                                        <div class="datagrid-title">{{ "ใช้ค่าเริ่มต้น" if language == 'th' else "Use Default Values" }}</div>
-                                        <div class="datagrid-content">
-                                            {% if record.is_default_value %}
-                                                <span class="badge bg-green">{{ "เปิดใช้งาน" if language == 'th' else "Enabled" }}</span>
+                            {% if record.created_at %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title>{{ "วันที่สร้าง" if language == 'th' else "Created At" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="text-muted">{{ record.created_at[:19] | replace('T', ' ') }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if record.updated_at %}
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "วันที่แก้ไขล่าสุด" if language == 'th' else "Last Updated" }}</div>
+                                <div class="datagrid-content">
+                                    <span class="text-muted">{{ record.updated_at[:19] | replace('T', ' ') }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Status Flags -->
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "สถานะ" if language == 'th' else "Status Flags" }}</div>
+                                <div class="datagrid-content">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            {% if record.is_active %}
+                                                <span class="badge bg-green">{{ "เปิดใช้งาน" if language == 'th' else "Active" }}</span>
                                             {% else %}
-                                                <span class="badge bg-red">{{ "ปิดใช้งาน" if language == 'th' else "Disabled" }}</span>
+                                                <span class="badge bg-red">{{ "ปิดใช้งาน" if language == 'th' else "Inactive" }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-6">
+                                            {% if record.is_deleted %}
+                                                <span class="badge bg-red">{{ "ถูกลบ" if language == 'th' else "Deleted" }}</span>
+                                            {% else %}
+                                                <span class="badge bg-green">{{ "ไม่ถูกลบ" if language == 'th' else "Not Deleted" }}</span>
                                             {% endif %}
                                         </div>
                                     </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notification Settings -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ "การตั้งค่าการแจ้งเตือน" if language == 'th' else "Notification Settings" }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- General Notifications -->
-                            <div class="col-md-6">
-                                <h5 class="mb-3">{{ "การแจ้งเตือนทั่วไป" if language == 'th' else "General Notifications" }}</h5>
-                                <div class="list-group list-group-flush">
-                                    {% if record.is_acknowledge is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "การยืนยัน" if language == 'th' else "Acknowledgment" }}
-                                        {% if record.is_acknowledge %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_admit_discard is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "รับ/จำหน่ายผู้ป่วย" if language == 'th' else "Admit/Discharge" }}
-                                        {% if record.is_admit_discard %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_status_change is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "เปลี่ยนสถานะ" if language == 'th' else "Status Change" }}
-                                        {% if record.is_status_change %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_line_notify is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "LINE Notify" if language == 'th' else "LINE Notify" }}
-                                        {% if record.is_line_notify %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_telegram_notify is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "Telegram Notify" if language == 'th' else "Telegram Notify" }}
-                                        {% if record.is_telegram_notify %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
                                 </div>
                             </div>
 
-                            <!-- Medical Data Monitoring -->
-                            <div class="col-md-6">
-                                <h5 class="mb-3">{{ "การติดตามข้อมูลทางการแพทย์" if language == 'th' else "Medical Data Monitoring" }}</h5>
-                                <div class="list-group list-group-flush">
-                                    {% if record.is_body_data is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "ข้อมูลร่างกาย" if language == 'th' else "Body Data" }}
-                                        {% if record.is_body_data %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_lab_data is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "ข้อมูลแล็บ" if language == 'th' else "Lab Data" }}
-                                        {% if record.is_lab_data %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_vs_data is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "ข้อมูลสัญญาณชีพ" if language == 'th' else "Vital Signs Data" }}
-                                        {% if record.is_vs_data %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_vs_notify is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "แจ้งเตือนสัญญาณชีพ" if language == 'th' else "Vital Signs Notify" }}
-                                        {% if record.is_vs_notify %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_watch_data is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "ข้อมูลนาฬิกา" if language == 'th' else "Watch Data" }}
-                                        {% if record.is_watch_data %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_watch_notify is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "แจ้งเตือนนาฬิกา" if language == 'th' else "Watch Notify" }}
-                                        {% if record.is_watch_notify %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if record.is_watch_status_change is defined %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ "เปลี่ยนสถานะนาฬิกา" if language == 'th' else "Watch Status Change" }}
-                                        {% if record.is_watch_status_change %}
-                                            <span class="badge bg-green">{{ "เปิด" if language == 'th' else "ON" }}</span>
-                                        {% else %}
-                                            <span class="badge bg-red">{{ "ปิด" if language == 'th' else "OFF" }}</span>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
+                            <!-- Raw JSON Data -->
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "ข้อมูล JSON ดิบ" if language == 'th' else "Raw JSON Data" }}</div>
+                                <div class="datagrid-content">
+                                    <details>
+                                        <summary class="btn btn-outline-secondary btn-sm">{{ "แสดงข้อมูลดิบ" if language == 'th' else "Show Raw Data" }}</summary>
+                                        <div class="mt-2">
+                                            <pre class="bg-light p-3 rounded" style="font-size: 11px; max-height: 300px; overflow-y: auto;"><code>{{ record | tojson(indent=2) }}</code></pre>
+                                        </div>
+                                    </details>
                                 </div>
                             </div>
                         </div>
@@ -839,4 +1116,627 @@
         </div>
     </div>
 </div>
+
+{% if data_type == 'hospitals' and record.location and record.location|length == 2 %}
+<script>
+    // Google Maps configuration
+    let map;
+    let marker;
+    let infoWindow;
+    let currentMapType = 'hybrid';
+    const mapTypes = ['roadmap', 'satellite', 'hybrid', 'terrain'];
+    const mapTypeNames = {
+        'roadmap': '{{ "ถนน" if language == "th" else "Road" }}',
+        'satellite': '{{ "ดาวเทียม" if language == "th" else "Satellite" }}',
+        'hybrid': '{{ "ผสม" if language == "th" else "Hybrid" }}',
+        'terrain': '{{ "ภูมิประเทศ" if language == "th" else "Terrain" }}'
+    };
+    
+    // Add Google Maps API key availability check
+    function checkGoogleMapsAPI() {
+        const apiKey = '{{ google_api_key }}';
+        if (!apiKey || apiKey.length < 10) {
+            return false;
+        }
+        return true;
+    }
+    
+    function initMap() {
+        if (!checkGoogleMapsAPI()) {
+            showMapError('Google Maps API key is missing or invalid');
+            return;
+        }
+        
+        try {
+            // Show loading overlay
+            showMapLoading();
+            
+            // Update status
+            updateMapStatus('{{ "กำลังโหลด..." if language == "th" else "Loading..." }}', 'warning');
+            
+            // Hospital coordinates
+            const hospitalLocation = { 
+                lat: parseFloat('{{ record.location[0] }}'), 
+                lng: parseFloat('{{ record.location[1] }}') 
+            };
+            
+            // Create both maps if containers exist
+            const mapContainer = document.getElementById("map");
+            const mapFullWidthContainer = document.getElementById("mapFullWidth");
+            
+            const mapOptions = {
+                zoom: 15,
+                center: hospitalLocation,
+                mapTypeId: currentMapType,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true,
+                zoomControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    mapTypeIds: mapTypes
+                },
+                streetViewControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_BOTTOM
+                },
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_CENTER
+                },
+                styles: [
+                    {
+                        featureType: "poi.business",
+                        stylers: [{ visibility: "on" }]
+                    },
+                    {
+                        featureType: "poi.medical",
+                        stylers: [{ visibility: "on" }]
+                    }
+                ]
+            };
+            
+            // Create the primary map (use full width if available, otherwise small map)
+            const targetContainer = mapFullWidthContainer || mapContainer;
+            if (targetContainer) {
+                map = new google.maps.Map(targetContainer, mapOptions);
+                
+                // Store reference for fullscreen functionality
+                if (mapFullWidthContainer) {
+                    window.mapFullWidth = map;
+                }
+                
+                // Custom hospital marker
+                const hospitalIcon = {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#dc3545" stroke="white" stroke-width="1.5">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            <path d="M9 9h6M12 6v6" stroke="white" stroke-width="2"/>
+                    `),
+                    scaledSize: new google.maps.Size(40, 40),
+                    anchor: new google.maps.Point(20, 40)
+                };
+                
+                // Create marker
+                marker = new google.maps.Marker({
+                    position: hospitalLocation,
+                    map: map,
+                    title: "{{ record.name|localized_name(language) if record.name else record.en_name }}",
+                    icon: hospitalIcon,
+                    animation: google.maps.Animation.DROP
+                });
+                
+                // Info window with enhanced content
+                infoWindow = new google.maps.InfoWindow({
+                    content: createInfoWindowContent(),
+                    maxWidth: 350
+                });
+                
+                // Event listeners
+                marker.addListener("click", () => {
+                    infoWindow.open(map, marker);
+                });
+                
+                map.addListener("maptypeid_changed", () => {
+                    currentMapType = map.getMapTypeId();
+                    updateMapType(mapTypeNames[currentMapType] || currentMapType);
+                    updateMapTypeFull(mapTypeNames[currentMapType] || currentMapType);
+                });
+                
+                map.addListener("zoom_changed", () => {
+                    const zoom = map.getZoom();
+                    updateZoomLevel(zoom);
+                    updateZoomLevelFull(zoom);
+                });
+                
+                map.addListener("tilesloaded", () => {
+                    hideMapLoading();
+                    updateMapStatus('{{ "โหลดแล้ว" if language == "th" else "Loaded" }}', 'success');
+                    updateMapStatusFull('{{ "โหลดแล้ว" if language == "th" else "Loaded" }}', 'success');
+                });
+                
+                // Open info window by default
+                setTimeout(() => {
+                    infoWindow.open(map, marker);
+                }, 500);
+                
+                // Initialize UI updates
+                updateZoomLevel(15);
+                updateMapType(mapTypeNames[currentMapType]);
+                updateZoomLevelFull(15);
+                updateMapTypeFull(mapTypeNames[currentMapType]);
+            }
+        } catch (error) {
+            console.error('Error initializing map:', error);
+            showMapError('เกิดข้อผิดพลาดในการโหลดแผนที่');
+        }
+    }
+    
+    function createInfoWindowContent() {
+        return `
+            <div class="p-2" style="max-width: 320px;">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="avatar avatar-sm bg-red text-white me-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M3 21l18 0"/>
+                            <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
+                            <path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4"/>
+                            <path d="M10 9l4 0"/>
+                            <path d="M12 7l0 4"/>
+                        </svg>
+                    </div>
+                    <h6 class="mb-0">{{ record.name|localized_name(language) if record.name else record.en_name }}</h6>
+                </div>
+                
+                <div class="mb-2">
+                    <small class="text-muted d-block">{{ "พิกัดที่ตั้ง" if language == "th" else "Coordinates" }}</small>
+                    <code class="small">{{ record.location[0] }}, {{ record.location[1] }}</code>
+                </div>
+                
+                {% if record.address %}
+                <div class="mb-2">
+                    <small class="text-muted d-block">{{ "ที่อยู่" if language == "th" else "Address" }}</small>
+                    <small>{{ record.address }}</small>
+                </div>
+                {% endif %}
+                
+                {% if record.phone %}
+                <div class="mb-2">
+                    <small class="text-muted d-block">{{ "โทรศัพท์" if language == "th" else "Phone" }}</small>
+                    <small><a href="tel:{{ record.phone }}" class="text-decoration-none">{{ record.phone }}</a></small>
+                </div>
+                {% endif %}
+                
+                <div class="d-flex gap-1 mt-2">
+                    <button class="btn btn-primary btn-sm" onclick="openGoogleMaps()" style="font-size: 11px;">
+                        {{ "เปิดใน Google Maps" if language == "th" else "Open in Google Maps" }}
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="getDirections()" style="font-size: 11px;">
+                        {{ "เส้นทาง" if language == "th" else "Directions" }}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function toggleMapType() {
+        const currentIndex = mapTypes.indexOf(currentMapType);
+        const nextIndex = (currentIndex + 1) % mapTypes.length;
+        const nextType = mapTypes[nextIndex];
+        map.setMapTypeId(nextType);
+    }
+    
+    function centerMap() {
+        const hospitalLocation = { 
+            lat: parseFloat('{{ record.location[0] }}'), 
+            lng: parseFloat('{{ record.location[1] }}') 
+        };
+        map.setCenter(hospitalLocation);
+        map.setZoom(17);
+        
+        // Bounce marker
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => {
+            marker.setAnimation(null);
+        }, 2000);
+    }
+    
+    function openGoogleMaps() {
+        const lat = parseFloat('{{ record.location[0] }}');
+        const lng = parseFloat('{{ record.location[1] }}');
+        const hospitalName = encodeURIComponent('{{ record.name|localized_name(language) if record.name else record.en_name }}');
+        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${hospitalName}`;
+        window.open(url, '_blank');
+    }
+    
+    function getDirections() {
+        const lat = parseFloat('{{ record.location[0] }}');
+        const lng = parseFloat('{{ record.location[1] }}');
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        window.open(url, '_blank');
+    }
+    
+    function copyCoordinates() {
+        const coords = "{{ record.location[0] }}, {{ record.location[1] }}";
+        navigator.clipboard.writeText(coords).then(() => {
+            showToast('{{ "คัดลอกแล้ว!" if language == "th" else "Copied!" }}', 
+                     '{{ "พิกัดถูกคัดลอกไปยังคลิปบอร์ดแล้ว" if language == "th" else "Coordinates copied to clipboard" }}', 
+                     'success');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = coords;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            showToast('{{ "คัดลอกแล้ว!" if language == "th" else "Copied!" }}', 
+                     '{{ "พิกัดถูกคัดลอกไปยังคลิปบอร์ดแล้ว" if language == "th" else "Coordinates copied to clipboard" }}', 
+                     'success');
+        });
+    }
+    
+    function shareLocation() {
+        const lat = parseFloat('{{ record.location[0] }}');
+        const lng = parseFloat('{{ record.location[1] }}');
+        const hospitalName = '{{ record.name|localized_name(language) if record.name else record.en_name }}';
+        const shareText = `${hospitalName}\n{{ "พิกัด:" if language == "th" else "Location:" }} ${lat}, ${lng}\nhttps://www.google.com/maps?q=${lat},${lng}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: hospitalName,
+                text: shareText,
+                url: `https://www.google.com/maps?q=${lat},${lng}`
+            }).catch(() => {
+                fallbackShare(shareText);
+            });
+        } else {
+            fallbackShare(shareText);
+        }
+    }
+    
+    function fallbackShare(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('{{ "แชร์แล้ว!" if language == "th" else "Shared!" }}', 
+                     '{{ "ข้อมูลตำแหน่งถูกคัดลอกไปยังคลิปบอร์ดแล้ว" if language == "th" else "Location info copied to clipboard" }}', 
+                     'success');
+        }).catch(() => {
+            showToast('{{ "ไม่สามารถแชร์ได้" if language == "th" else "Unable to share" }}', 
+                     text, 
+                     'info');
+        });
+    }
+    
+    function updateZoomLevel(zoom) {
+        const element = document.getElementById('zoomLevel');
+        if (element) element.textContent = zoom;
+    }
+    
+    function updateMapType(type) {
+        const element = document.getElementById('mapType');
+        if (element) element.textContent = type;
+    }
+    
+    function updateMapStatus(status, type) {
+        const element = document.getElementById('mapStatus');
+        if (element) {
+            const badgeClass = type === 'success' ? 'bg-success' : type === 'warning' ? 'bg-warning' : type === 'danger' ? 'bg-danger' : 'bg-secondary';
+            element.innerHTML = `<span class="badge ${badgeClass}">${status}</span>`;
+        }
+    }
+    
+    function showToast(title, message, type) {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} position-fixed shadow-lg`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="flex-fill">
+                    <h4 class="alert-title">${title}</h4>
+                    <div class="text-secondary">${message}</div>
+                </div>
+                <button type="button" class="btn-close" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 4000);
+    }
+    
+    function updateMapStatus(status, type = 'info') {
+        const element = document.getElementById('mapStatusFull');
+        if (element) {
+            const badgeClass = type === 'success' ? 'bg-success' : 
+                              type === 'danger' ? 'bg-danger' : 
+                              type === 'warning' ? 'bg-warning' : 'bg-info';
+            element.innerHTML = `<span class="badge ${badgeClass}">${status}</span>`;
+        }
+    }
+    
+    function fullscreenMap() {
+        const mapContainer = document.getElementById('mapFullWidth');
+        if (mapContainer) {
+            if (mapContainer.requestFullscreen) {
+                mapContainer.requestFullscreen();
+            } else if (mapContainer.webkitRequestFullscreen) {
+                mapContainer.webkitRequestFullscreen();
+            } else if (mapContainer.msRequestFullscreen) {
+                mapContainer.msRequestFullscreen();
+            }
+            
+            // Trigger resize after fullscreen
+            setTimeout(() => {
+                if (window.mapFullWidth) {
+                    google.maps.event.trigger(window.mapFullWidth, 'resize');
+                }
+            }, 100);
+        }
+    }
+    
+    function searchNearby() {
+        const lat = parseFloat('{{ record.location[0] }}');
+        const lng = parseFloat('{{ record.location[1] }}');
+        const searchUrl = `https://www.google.com/maps/search/hospital/@${lat},${lng},15z`;
+        window.open(searchUrl, '_blank');
+    }
+    
+    function hideMapLoading() {
+        const overlay = document.getElementById('mapLoadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+    
+    function showMapLoading() {
+        const overlay = document.getElementById('mapLoadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+        }
+    }
+
+    // Load Google Maps API with proper API key
+    function loadGoogleMaps() {
+        const apiKey = '{{ google_api_key }}';
+        if (!apiKey) {
+            updateMapStatus('{{ "ไม่พบ API Key" if language == "th" else "API Key Missing" }}', 'danger');
+            document.getElementById('map').innerHTML = `
+                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                    <div class="text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                            <path d="M9 10l.01 0"/>
+                            <path d="M15 10l.01 0"/>
+                            <path d="M9.5 15a3.5 3.5 0 0 0 5 0"/>
+                        </svg>
+                        <div>{{ "ต้องการ Google Maps API Key" if language == "th" else "Google Maps API Key Required" }}</div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        if (typeof google === 'undefined') {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=geometry`;
+            script.async = true;
+            script.defer = true;
+            script.onerror = () => {
+                updateMapStatus('{{ "โหลดแผนที่ไม่สำเร็จ" if language == "th" else "Failed to Load Map" }}', 'danger');
+            };
+            document.head.appendChild(script);
+        } else {
+            initMap();
+        }
+    }
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+    
+    // Add map interaction for updating hospital location
+    let isEditMode = false;
+    
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const editButton = document.getElementById('editLocationBtn');
+        const saveButton = document.getElementById('saveLocationBtn');
+        const cancelButton = document.getElementById('cancelLocationBtn');
+        
+        if (isEditMode) {
+            editButton.style.display = 'none';
+            saveButton.style.display = 'inline-block';
+            cancelButton.style.display = 'inline-block';
+            
+            // Make marker draggable
+            if (marker) {
+                marker.setDraggable(true);
+                marker.addListener('dragend', onMarkerDragEnd);
+            }
+            
+            showToast('{{ "โหมดแก้ไข" if language == "th" else "Edit Mode" }}', 
+                     '{{ "ลากปักหมุดเพื่อเปลี่ยนตำแหน่ง" if language == "th" else "Drag the marker to change location" }}', 
+                     'info');
+        } else {
+            editButton.style.display = 'inline-block';
+            saveButton.style.display = 'none';
+            cancelButton.style.display = 'none';
+            
+            // Make marker non-draggable
+            if (marker) {
+                marker.setDraggable(false);
+                google.maps.event.clearListeners(marker, 'dragend');
+            }
+        }
+    }
+    
+    function onMarkerDragEnd(event) {
+        const newLat = event.latLng.lat();
+        const newLng = event.latLng.lng();
+        
+        // Update coordinates display
+        updateCoordinatesDisplay(newLat, newLng);
+        
+        // Reverse geocode to get address information
+        reverseGeocode(newLat, newLng);
+    }
+    
+    function updateCoordinatesDisplay(lat, lng) {
+        // Update the coordinates in the Location Information section
+        const latDisplay = document.querySelector('.coordinates-display .latitude-value');
+        const lngDisplay = document.querySelector('.coordinates-display .longitude-value');
+        
+        if (latDisplay) latDisplay.textContent = lat.toFixed(8);
+        if (lngDisplay) lngDisplay.textContent = lng.toFixed(8);
+    }
+    
+    function reverseGeocode(lat, lng) {
+        const geocoder = new google.maps.Geocoder();
+        const latlng = { lat: lat, lng: lng };
+        
+        geocoder.geocode({ location: latlng }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                const addressComponents = results[0].address_components;
+                const formattedAddress = results[0].formatted_address;
+                
+                // Update address display
+                updateAddressDisplay(formattedAddress, addressComponents);
+                
+                showToast('{{ "อัปเดตที่อยู่" if language == "th" else "Address Updated" }}', 
+                         '{{ "ที่อยู่ใหม่จากพิกัด GPS" if language == "th" else "New address from GPS coordinates" }}', 
+                         'success');
+            } else {
+                console.error('Geocoder failed: ' + status);
+            }
+        });
+    }
+    
+    function updateAddressDisplay(formattedAddress, addressComponents) {
+        // Update the constructed address in the UI
+        const addressDisplay = document.querySelector('.constructed-address .address-text');
+        if (addressDisplay) {
+            addressDisplay.innerHTML = `
+                <div class="text-muted small mb-1">{{ "ที่อยู่จาก Google Maps" if language == "th" else "Address from Google Maps" }}</div>
+                <div class="h6 mb-0 text-primary">${formattedAddress}</div>
+            `;
+        }
+        
+        // Store the new address data for saving
+        window.newLocationData = {
+            formatted_address: formattedAddress,
+            address_components: addressComponents,
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
+        };
+    }
+    
+    function saveLocationUpdate() {
+        if (!window.newLocationData) {
+            showToast('{{ "ไม่มีการเปลี่ยนแปลง" if language == "th" else "No Changes" }}', 
+                     '{{ "ไม่มีตำแหน่งใหม่ที่จะบันทึก" if language == "th" else "No new location to save" }}', 
+                     'warning');
+            return;
+        }
+        
+        const hospitalId = '{{ record._id }}';
+        const updateData = {
+            location: [window.newLocationData.lat, window.newLocationData.lng],
+            formatted_address: window.newLocationData.formatted_address,
+            address_components: window.newLocationData.address_components
+        };
+        
+        // Show loading
+        const saveButton = document.getElementById('saveLocationBtn');
+        const originalText = saveButton.innerHTML;
+        saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>{{ "กำลังบันทึก..." if language == "th" else "Saving..." }}';
+        saveButton.disabled = true;
+        
+        // Send update request
+        fetch(`/admin/master-data/hospitals/${hospitalId}/update-location`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('{{ "บันทึกสำเร็จ" if language == "th" else "Saved Successfully" }}', 
+                         '{{ "ตำแหน่งและที่อยู่ถูกอัปเดตแล้ว" if language == "th" else "Location and address updated" }}', 
+                         'success');
+                
+                // Exit edit mode
+                toggleEditMode();
+                
+                // Clear the temporary data
+                window.newLocationData = null;
+                
+                // Optionally reload the page to show updated data
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                throw new Error(data.error || 'Update failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating location:', error);
+            showToast('{{ "บันทึกไม่สำเร็จ" if language == "th" else "Save Failed" }}', 
+                     error.message || '{{ "เกิดข้อผิดพลาดในการบันทึก" if language == "th" else "An error occurred while saving" }}', 
+                     'danger');
+        })
+        .finally(() => {
+            // Reset button
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+        });
+    }
+    
+    function cancelLocationUpdate() {
+        // Reset marker to original position
+        const originalLat = parseFloat('{{ record.location[0] }}');
+        const originalLng = parseFloat('{{ record.location[1] }}');
+        const originalPosition = { lat: originalLat, lng: originalLng };
+        
+        marker.setPosition(originalPosition);
+        map.setCenter(originalPosition);
+        
+        // Reset coordinates display
+        updateCoordinatesDisplay(originalLat, originalLng);
+        
+        // Reset address display
+        const addressDisplay = document.querySelector('.constructed-address .address-text');
+        if (addressDisplay) {
+            // Restore original administrative address
+            const originalContent = `
+                <div class="text-muted small mb-1">{{ "ที่อยู่ตามเขตการปกครอง" if language == "th" else "Administrative Address" }}</div>
+                <div class="h6 mb-0">
+                    {% if related_data.sub_district %}{{ related_data.sub_district.name|localized_name(language) }}{% endif %}
+                    {% if related_data.district %}{% if related_data.sub_district %}, {% endif %}{{ related_data.district.name|localized_name(language) }}{% endif %}
+                    {% if related_data.province %}{% if related_data.district or related_data.sub_district %}, {% endif %}{{ related_data.province.name|localized_name(language) }}{% endif %}
+                </div>
+            `;
+            addressDisplay.innerHTML = originalContent;
+        }
+        
+        // Clear temporary data
+        window.newLocationData = null;
+        
+        // Exit edit mode
+        toggleEditMode();
+        
+        showToast('{{ "ยกเลิกแล้ว" if language == "th" else "Cancelled" }}', 
+                 '{{ "การเปลี่ยนแปลงถูกยกเลิก" if language == "th" else "Changes were cancelled" }}', 
+                 'info');
+    }
+</script>
+{% endif %}
+
+{% endif %}
+
 {% endblock %}

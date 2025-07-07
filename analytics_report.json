@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "total_events": 11,
+    "filter_events": 5,
+    "page_events": 6
+  },
+  "filter_usage": {
+    "is_active=true": 1,
+    "is_active=false": 1,
+    "is_active=None": 1,
+    "search=bangkok": 1,
+    "province=10": 1
+  },
+  "page_performance": {
+    "login": {
+      "avg_response_time": 421.212,
+      "min_response_time": 421.212,
+      "max_response_time": 421.212,
+      "total_requests": 1
+    },
+    "hospitals_filtered": {
+      "avg_response_time": 719.5322,
+      "min_response_time": 625.2429999999999,
+      "max_response_time": 861.369,
+      "total_requests": 5
+    }
+  },
+  "report_generated": "2025-07-07T14:03:39.026854"
+}

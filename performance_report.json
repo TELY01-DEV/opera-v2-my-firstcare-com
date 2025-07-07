@@ -1,0 +1,97 @@
+{
+  "summary": {
+    "total_requests": 13,
+    "avg_response_time": 700.11,
+    "min_response_time": 521.52,
+    "max_response_time": 999.92,
+    "performance_grade": "C"
+  },
+  "performance_distribution": {
+    "fast_requests": 0,
+    "medium_requests": 13,
+    "slow_requests": 0
+  },
+  "endpoint_performance": {
+    "All hospitals (no filters)": {
+      "avg_time": 999.9182224273682,
+      "min_time": 999.9182224273682,
+      "max_time": 999.9182224273682,
+      "request_count": 1
+    },
+    "Active hospitals only": {
+      "avg_time": 660.3291034698486,
+      "min_time": 660.3291034698486,
+      "max_time": 660.3291034698486,
+      "request_count": 1
+    },
+    "Inactive hospitals only": {
+      "avg_time": 791.1951541900635,
+      "min_time": 791.1951541900635,
+      "max_time": 791.1951541900635,
+      "request_count": 1
+    },
+    "Search: Bangkok": {
+      "avg_time": 537.6393795013428,
+      "min_time": 537.6393795013428,
+      "max_time": 537.6393795013428,
+      "request_count": 1
+    },
+    "Search: Hospital": {
+      "avg_time": 521.5227603912354,
+      "min_time": 521.5227603912354,
+      "max_time": 521.5227603912354,
+      "request_count": 1
+    },
+    "Search: Thai text": {
+      "avg_time": 809.3650341033936,
+      "min_time": 809.3650341033936,
+      "max_time": 809.3650341033936,
+      "request_count": 1
+    },
+    "Page 1 (10 items)": {
+      "avg_time": 691.6189193725586,
+      "min_time": 691.6189193725586,
+      "max_time": 691.6189193725586,
+      "request_count": 1
+    },
+    "Page 1 (50 items)": {
+      "avg_time": 642.204999923706,
+      "min_time": 642.204999923706,
+      "max_time": 642.204999923706,
+      "request_count": 1
+    },
+    "Large page (100 items)": {
+      "avg_time": 821.6767311096191,
+      "min_time": 821.6767311096191,
+      "max_time": 821.6767311096191,
+      "request_count": 1
+    },
+    "Active + Search": {
+      "avg_time": 531.6989421844482,
+      "min_time": 531.6989421844482,
+      "max_time": 531.6989421844482,
+      "request_count": 1
+    },
+    "Active + Pagination": {
+      "avg_time": 657.6850414276123,
+      "min_time": 657.6850414276123,
+      "max_time": 657.6850414276123,
+      "request_count": 1
+    },
+    "Province filter": {
+      "avg_time": 823.3880996704102,
+      "min_time": 823.3880996704102,
+      "max_time": 823.3880996704102,
+      "request_count": 1
+    },
+    "District filter": {
+      "avg_time": 613.1582260131836,
+      "min_time": 613.1582260131836,
+      "max_time": 613.1582260131836,
+      "request_count": 1
+    }
+  },
+  "optimization_suggestions": [],
+  "slow_query_threshold": 1000,
+  "generated_at": "2025-07-07T14:03:25.247669"
+}

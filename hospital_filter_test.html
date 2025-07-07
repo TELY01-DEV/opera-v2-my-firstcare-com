@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Filter Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .filter-section { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .filter-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .filter-col { flex: 1; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>🏥 Hospital Sub-District Filter Test</h1>
+    
+    <div class="filter-section">
+        <h3>Location Filters</h3>
+        <div class="filter-row">
+            <div class="filter-col">
+                <label>Province</label>
+                <select id="province-filter">
+                    <option value="">All Provinces</option>
+                    <option value="10">Bangkok</option>
+                    <option value="11">Samut Prakan</option>
+                    <option value="12">Nonthaburi</option>
+                </select>
+            </div>
+            <div class="filter-col">
+                <label>District</label>
+                <select id="district-filter">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+            <div class="filter-col">
+                <label>Sub-District</label>
+                <select id="sub-district-filter">
+                    <option value="">All Sub-Districts</option>
+                </select>
+            </div>
+            <div class="filter-col">
+                <label>Hospital Type</label>
+                <select id="type-filter">
+                    <option value="">All Types</option>
+                    <option value="general">General Hospital</option>
+                    <option value="specialty">Specialty Hospital</option>
+                    <option value="clinic">Clinic</option>
+                    <option value="emergency">Emergency Center</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-row">
+            <div class="filter-col">
+                <button class="btn-primary" id="apply-filters">Apply Filters</button>
+                <button class="btn-secondary" id="clear-filters">Clear Filters</button>
+            </div>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Hospital ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Sub-District</th>
+                <th>Type</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>H001</td>
+                <td>Bangkok General Hospital</td>
+                <td>Bangkok</td>
+                <td>Pathum Wan</td>
+                <td>General</td>
+                <td>02-123-4567</td>
+                <td><span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 3px;">Active</span></td>
+                <td>
+                    <button style="padding: 5px 10px; margin-right: 5px;">View</button>
+                    <button style="padding: 5px 10px;">Edit</button>
+                </td>
+            </tr>
+            <tr>
+                <td>H002</td>
+                <td>Samut Prakan Hospital</td>
+                <td>Samut Prakan</td>
+                <td>Muang Samut Prakan</td>
+                <td>General</td>
+                <td>02-234-5678</td>
+                <td><span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 3px;">Active</span></td>
+                <td>
+                    <button style="padding: 5px 10px; margin-right: 5px;">View</button>
+                    <button style="padding: 5px 10px;">Edit</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <script>
+        // Test the cascading dropdown logic
+        document.getElementById('province-filter').addEventListener('change', function() {
+            const provinceCode = this.value;
+            const districtSelect = document.getElementById('district-filter');
+            const subDistrictSelect = document.getElementById('sub-district-filter');
+            
+            // Clear dependent dropdowns
+            districtSelect.innerHTML = '<option value="">All Districts</option>';
+            subDistrictSelect.innerHTML = '<option value="">All Sub-Districts</option>';
+            
+            if (provinceCode) {
+                console.log(`Selected province: ${provinceCode}`);
+                
+                // Simulate API call
+                if (provinceCode === '10') { // Bangkok
+                    const districts = [
+                        {code: '1001', name: 'Pathum Wan'},
+                        {code: '1002', name: 'Phra Nakhon'},
+                        {code: '1003', name: 'Dusit'}
+                    ];
+                    
+                    districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.code;
+                        option.textContent = district.name;
+                        districtSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+        
+        document.getElementById('district-filter').addEventListener('change', function() {
+            const districtCode = this.value;
+            const subDistrictSelect = document.getElementById('sub-district-filter');
+            
+            subDistrictSelect.innerHTML = '<option value="">All Sub-Districts</option>';
+            
+            if (districtCode) {
+                console.log(`Selected district: ${districtCode}`);
+                
+                // Simulate API call
+                if (districtCode === '1001') { // Pathum Wan
+                    const subDistricts = [
+                        {code: '10001', name: 'Lumphini'},
+                        {code: '10002', name: 'Rong Muang'},
+                        {code: '10003', name: 'Wang Mai'}
+                    ];
+                    
+                    subDistricts.forEach(subDistrict => {
+                        const option = document.createElement('option');
+                        option.value = subDistrict.code;
+                        option.textContent = subDistrict.name;
+                        subDistrictSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+        
+        document.getElementById('apply-filters').addEventListener('click', function() {
+            const province = document.getElementById('province-filter').value;
+            const district = document.getElementById('district-filter').value;
+            const subDistrict = document.getElementById('sub-district-filter').value;
+            const type = document.getElementById('type-filter').value;
+            
+            console.log('Apply filters:', { province, district, subDistrict, type });
+            alert(`Filters applied:\nProvince: ${province}\nDistrict: ${district}\nSub-District: ${subDistrict}\nType: ${type}`);
+        });
+        
+        document.getElementById('clear-filters').addEventListener('click', function() {
+            document.getElementById('province-filter').value = '';
+            document.getElementById('district-filter').innerHTML = '<option value="">All Districts</option>';
+            document.getElementById('sub-district-filter').innerHTML = '<option value="">All Sub-Districts</option>';
+            document.getElementById('type-filter').value = '';
+            console.log('Filters cleared');
+        });
+    </script>
+</body>
+</html>

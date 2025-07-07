@@ -83,6 +83,141 @@ MASTER_DATA_TYPES = {
         "fields": ["name", "code", "hospital_type_code", "address", "province_code", 
                   "district_code", "sub_district_code", "postal_code", "phone", "email"],
         "required_fields": ["name", "code"]
+    },
+    "departments": {
+        "title": "Departments",
+        "title_th": "แผนก",
+        "singular": "Department",
+        "singular_th": "แผนก",
+        "icon": "building-store",
+        "fields": ["name", "code", "description", "hospital_code"],
+        "required_fields": ["name", "code"]
+    },
+    "specialties": {
+        "title": "Medical Specialties",
+        "title_th": "ความเชี่ยวชาญทางการแพทย์",
+        "singular": "Specialty",
+        "singular_th": "ความเชี่ยวชาญ",
+        "icon": "stethoscope",
+        "fields": ["name", "code", "description"],
+        "required_fields": ["name", "code"]
+    },
+    "positions": {
+        "title": "Staff Positions",
+        "title_th": "ตำแหน่งงาน",
+        "singular": "Position",
+        "singular_th": "ตำแหน่ง",
+        "icon": "user-check",
+        "fields": ["name", "code", "description", "level"],
+        "required_fields": ["name", "code"]
+    },
+    "device-types": {
+        "title": "Device Types",
+        "title_th": "ประเภทอุปกรณ์",
+        "singular": "Device Type",
+        "singular_th": "ประเภทอุปกรณ์",
+        "icon": "device-desktop",
+        "fields": ["name", "code", "description", "category"],
+        "required_fields": ["name", "code"]
+    },
+    "manufacturers": {
+        "title": "Manufacturers",
+        "title_th": "ผู้ผลิต",
+        "singular": "Manufacturer",
+        "singular_th": "ผู้ผลิต",
+        "icon": "building-factory",
+        "fields": ["name", "code", "country", "contact_info"],
+        "required_fields": ["name", "code"]
+    },
+    "insurance-types": {
+        "title": "Insurance Types",
+        "title_th": "ประเภทประกันสุขภาพ",
+        "singular": "Insurance Type",
+        "singular_th": "ประเภทประกันสุขภาพ",
+        "icon": "shield-check",
+        "fields": ["name", "code", "description", "coverage_details"],
+        "required_fields": ["name", "code"]
+    },
+    "vital-sign-types": {
+        "title": "Vital Sign Types",
+        "title_th": "ประเภทสัญญาณชีพ",
+        "singular": "Vital Sign Type",
+        "singular_th": "ประเภทสัญญาณชีพ",
+        "icon": "heartbeat",
+        "fields": ["name", "code", "unit", "normal_range_min", "normal_range_max"],
+        "required_fields": ["name", "code", "unit"]
+    },
+    "medication-categories": {
+        "title": "Medication Categories",
+        "title_th": "หมวดหมู่ยา",
+        "singular": "Medication Category",
+        "singular_th": "หมวดหมู่ยา",
+        "icon": "pill",
+        "fields": ["name", "code", "description"],
+        "required_fields": ["name", "code"]
+    },
+    "appointment-types": {
+        "title": "Appointment Types",
+        "title_th": "ประเภทการนัดหมาย",
+        "singular": "Appointment Type",
+        "singular_th": "ประเภทการนัดหมาย",
+        "icon": "calendar",
+        "fields": ["name", "code", "description", "duration_minutes"],
+        "required_fields": ["name", "code"]
+    },
+    "emergency-levels": {
+        "title": "Emergency Levels",
+        "title_th": "ระดับความฉุกเฉิน",
+        "singular": "Emergency Level",
+        "singular_th": "ระดับความฉุกเฉิน",
+        "icon": "alert-triangle",
+        "fields": ["name", "code", "description", "priority", "color"],
+        "required_fields": ["name", "code", "priority"]
+    },
+    "patient-statuses": {
+        "title": "Patient Statuses",
+        "title_th": "สถานะผู้ป่วย",
+        "singular": "Patient Status",
+        "singular_th": "สถานะผู้ป่วย",
+        "icon": "user-heart",
+        "fields": ["name", "code", "description", "color"],
+        "required_fields": ["name", "code"]
+    },
+    "room-types": {
+        "title": "Room Types",
+        "title_th": "ประเภทห้อง",
+        "singular": "Room Type",
+        "singular_th": "ประเภทห้อง",
+        "icon": "door",
+        "fields": ["name", "code", "description", "capacity"],
+        "required_fields": ["name", "code"]
+    },
+    "languages": {
+        "title": "Languages",
+        "title_th": "ภาษา",
+        "singular": "Language",
+        "singular_th": "ภาษา",
+        "icon": "language",
+        "fields": ["name", "code", "native_name"],
+        "required_fields": ["name", "code"]
+    },
+    "nationalities": {
+        "title": "Nationalities",
+        "title_th": "สัญชาติ",
+        "singular": "Nationality",
+        "singular_th": "สัญชาติ",
+        "icon": "flag",
+        "fields": ["name", "code", "country_code"],
+        "required_fields": ["name", "code"]
+    },
+    "religions": {
+        "title": "Religions",
+        "title_th": "ศาสนา",
+        "singular": "Religion",
+        "singular_th": "ศาสนา",
+        "icon": "star",
+        "fields": ["name", "code", "description"],
+        "required_fields": ["name", "code"]
     }
 }
 
@@ -154,11 +289,68 @@ async def master_data_list(request: Request, data_type: str, page: int = 1, sear
             is_active_bool = False
     
     try:
-        # Fetch data from Stardust API
-        data_response = await stardust_api.get_master_data(
-            token, data_type, skip, limit, search, province_code_int, district_code_int,
-            is_active_bool, date_from, date_to
-        )
+        # For hospitals, fetch all data to ensure proper sorting, then paginate client-side
+        if data_type == "hospitals":
+            print(f"DEBUG: Fetching all hospital data for proper sorting")
+            # Fetch all records first for proper sorting
+            data_response = await stardust_api.get_master_data(
+                token, data_type, 0, 1000, search, province_code_int, district_code_int,
+                is_active_bool, date_from, date_to
+            )
+            print(f"DEBUG: Raw data response for hospitals (fetched up to 1000 records)")
+            
+            # Extract the actual data from the response
+            if "data" in data_response and "data" in data_response["data"]:
+                all_records = data_response["data"]["data"]
+                total_count = data_response["data"].get("total", 0)
+            elif "data" in data_response:
+                all_records = data_response["data"]
+                total_count = data_response.get("total", len(all_records) if isinstance(all_records, list) else 0)
+            else:
+                all_records = []
+                total_count = 0
+            
+            print(f"DEBUG: Extracted {len(all_records) if isinstance(all_records, list) else 0} hospital records")
+            
+            # Sort all records by updated_at in descending order (most recent first)
+            if isinstance(all_records, list) and all_records:
+                print(f"DEBUG: Sorting {len(all_records)} hospital records by updated_at")
+                def get_sort_date(record):
+                    updated = record.get('updated_at')
+                    created = record.get('created_at')
+                    return updated if updated else (created if created else '')
+                
+                all_records = sorted(all_records, key=get_sort_date, reverse=True)
+                print(f"DEBUG: Hospital records sorted - most recent first")
+                
+                # Now apply client-side pagination
+                start_idx = skip
+                end_idx = skip + limit
+                records_data = all_records[start_idx:end_idx]
+                print(f"DEBUG: Applied pagination: showing records {start_idx+1}-{min(end_idx, len(all_records))} of {len(all_records)}")
+            else:
+                records_data = []
+                
+        else:
+            # For other data types, use normal pagination
+            print(f"DEBUG: Fetching master data for {data_type} with params: skip={skip}, limit={limit}, search={search}")
+            data_response = await stardust_api.get_master_data(
+                token, data_type, skip, limit, search, province_code_int, district_code_int,
+                is_active_bool, date_from, date_to
+            )
+            
+            # Extract the actual data from the response
+            if "data" in data_response and "data" in data_response["data"]:
+                records_data = data_response["data"]["data"]
+                total_count = data_response["data"].get("total", 0)
+            elif "data" in data_response:
+                records_data = data_response["data"]
+                total_count = data_response.get("total", len(records_data) if isinstance(records_data, list) else 0)
+            else:
+                records_data = []
+                total_count = 0
+                
+            print(f"DEBUG: Extracted {len(records_data) if isinstance(records_data, list) else 0} records, total: {total_count}")
         
         # Get reference data for dropdowns
         provinces = []
@@ -167,7 +359,16 @@ async def master_data_list(request: Request, data_type: str, page: int = 1, sear
         
         if data_type in ["districts", "sub-districts", "hospitals"]:
             provinces_response = await stardust_api.get_provinces(token, 0, 1000)
-            provinces = provinces_response.get("data", [])
+            print(f"DEBUG: Raw provinces_response: {provinces_response}")
+            
+            # Handle nested structure for provinces
+            if "data" in provinces_response and "data" in provinces_response["data"]:
+                provinces = provinces_response["data"]["data"]
+            elif "data" in provinces_response:
+                provinces = provinces_response["data"]
+            else:
+                provinces = []
+            print(f"DEBUG: Extracted {len(provinces)} provinces")
         
         # Load districts for sub-districts and hospitals pages
         if data_type in ["sub-districts", "hospitals"]:
@@ -177,11 +378,30 @@ async def master_data_list(request: Request, data_type: str, page: int = 1, sear
             else:
                 # Load all districts for displaying district names in the table
                 districts_response = await stardust_api.get_districts(token, 0, 1000, None)
-            districts = districts_response.get("data", [])
+                
+            print(f"DEBUG: Raw districts_response: {districts_response}")
+            
+            # Handle nested structure for districts
+            if "data" in districts_response and "data" in districts_response["data"]:
+                districts = districts_response["data"]["data"]
+            elif "data" in districts_response:
+                districts = districts_response["data"]
+            else:
+                districts = []
+            print(f"DEBUG: Extracted {len(districts)} districts")
             
         if data_type == "hospitals":
             hospital_types_response = await stardust_api.get_hospital_types(token, 0, 1000)
-            hospital_types = hospital_types_response.get("data", [])
+            print(f"DEBUG: Raw hospital_types_response: {hospital_types_response}")
+            
+            # Handle nested structure for hospital_types
+            if "data" in hospital_types_response and "data" in hospital_types_response["data"]:
+                hospital_types = hospital_types_response["data"]["data"]
+            elif "data" in hospital_types_response:
+                hospital_types = hospital_types_response["data"]
+            else:
+                hospital_types = []
+            print(f"DEBUG: Extracted {len(hospital_types)} hospital_types")
         
         return templates.TemplateResponse("admin/master_data/list.html", {
             "request": request,
@@ -189,8 +409,8 @@ async def master_data_list(request: Request, data_type: str, page: int = 1, sear
             "page_title": f"{MASTER_DATA_TYPES[data_type]['title']} Management",
             "data_type": data_type,
             "data_config": MASTER_DATA_TYPES[data_type],
-            "records": data_response.get("data", []),
-            "total": data_response.get("total", 0),
+            "records": records_data,
+            "total": total_count,
             "page": page,
             "limit": limit,
             "search": search,
@@ -242,11 +462,23 @@ async def master_data_create_form(request: Request, data_type: str):
         
         if data_type in ["districts", "sub-districts", "hospitals"]:
             provinces_response = await stardust_api.get_provinces(token, 0, 1000)
-            provinces = provinces_response.get("data", [])
+            # Handle nested structure for provinces
+            if "data" in provinces_response and "data" in provinces_response["data"]:
+                provinces = provinces_response["data"]["data"]
+            elif "data" in provinces_response:
+                provinces = provinces_response["data"]
+            else:
+                provinces = []
         
         if data_type == "hospitals":
             hospital_types_response = await stardust_api.get_hospital_types(token, 0, 1000)
-            hospital_types = hospital_types_response.get("data", [])
+            # Handle nested structure for hospital_types
+            if "data" in hospital_types_response and "data" in hospital_types_response["data"]:
+                hospital_types = hospital_types_response["data"]["data"]
+            elif "data" in hospital_types_response:
+                hospital_types = hospital_types_response["data"]
+            else:
+                hospital_types = []
         
         return templates.TemplateResponse("admin/master_data/form.html", {
             "request": request,
@@ -290,7 +522,29 @@ async def master_data_edit_form(request: Request, data_type: str, record_id: str
     
     try:
         # Get the record
-        record = await stardust_api.get_master_data_record(token, data_type, record_id)
+        api_response = await stardust_api.get_master_data_record(token, data_type, record_id)
+        
+        # Extract the actual record from the API response
+        if api_response.get("success") and "data" in api_response:
+            if data_type == "hospitals" and "hospital" in api_response["data"]:
+                record = api_response["data"]["hospital"]
+            elif data_type == "provinces" and "province" in api_response["data"]:
+                record = api_response["data"]["province"]
+            elif data_type == "districts" and "district" in api_response["data"]:
+                record = api_response["data"]["district"]
+            elif data_type == "sub-districts" and "sub_district" in api_response["data"]:
+                record = api_response["data"]["sub_district"]
+            elif data_type == "hospital-types" and "hospital_type" in api_response["data"]:
+                record = api_response["data"]["hospital_type"]
+            else:
+                # Fallback: try to get the data directly or use the first value
+                data_content = api_response["data"]
+                if isinstance(data_content, dict) and len(data_content) == 1:
+                    record = list(data_content.values())[0]
+                else:
+                    record = data_content
+        else:
+            raise HTTPException(status_code=404, detail="Record not found")
         
         # Get reference data for dropdowns
         provinces = []
@@ -299,15 +553,33 @@ async def master_data_edit_form(request: Request, data_type: str, record_id: str
         
         if data_type in ["districts", "sub-districts", "hospitals"]:
             provinces_response = await stardust_api.get_provinces(token, 0, 1000)
-            provinces = provinces_response.get("data", [])
+            # Handle nested structure for provinces
+            if "data" in provinces_response and "data" in provinces_response["data"]:
+                provinces = provinces_response["data"]["data"]
+            elif "data" in provinces_response:
+                provinces = provinces_response["data"]
+            else:
+                provinces = []
         
         if data_type in ["sub-districts", "hospitals"] and record.get("province_code"):
             districts_response = await stardust_api.get_districts(token, 0, 1000, None, record.get("province_code"))
-            districts = districts_response.get("data", [])
+            # Handle nested structure for districts
+            if "data" in districts_response and "data" in districts_response["data"]:
+                districts = districts_response["data"]["data"]
+            elif "data" in districts_response:
+                districts = districts_response["data"]
+            else:
+                districts = []
             
         if data_type == "hospitals":
             hospital_types_response = await stardust_api.get_hospital_types(token, 0, 1000)
-            hospital_types = hospital_types_response.get("data", [])
+            # Handle nested structure for hospital_types
+            if "data" in hospital_types_response and "data" in hospital_types_response["data"]:
+                hospital_types = hospital_types_response["data"]["data"]
+            elif "data" in hospital_types_response:
+                hospital_types = hospital_types_response["data"]
+            else:
+                hospital_types = []
         
         return templates.TemplateResponse("admin/master_data/form.html", {
             "request": request,
@@ -335,11 +607,38 @@ async def master_data_detail(request: Request, data_type: str, record_id: str):
     if data_type not in MASTER_DATA_TYPES:
         raise HTTPException(status_code=404, detail="Master data type not found")
     
+    # auth_result is the token when user is authenticated
     token = auth_result
     
     try:
         # Get the record
-        record = await stardust_api.get_master_data_record(token, data_type, record_id)
+        print(f"DEBUG: Fetching {data_type} record with ID: {record_id}")
+        api_response = await stardust_api.get_master_data_record(token, data_type, record_id)
+        print(f"DEBUG: Fetched API response: {api_response}")
+        
+        # Extract the actual record from the API response
+        if api_response.get("success") and "data" in api_response:
+            if data_type == "hospitals" and "hospital" in api_response["data"]:
+                record = api_response["data"]["hospital"]
+            elif data_type == "provinces" and "province" in api_response["data"]:
+                record = api_response["data"]["province"]
+            elif data_type == "districts" and "district" in api_response["data"]:
+                record = api_response["data"]["district"]
+            elif data_type == "sub-districts" and "sub_district" in api_response["data"]:
+                record = api_response["data"]["sub_district"]
+            elif data_type == "hospital-types" and "hospital_type" in api_response["data"]:
+                record = api_response["data"]["hospital_type"]
+            else:
+                # Fallback: try to get the data directly or use the first value
+                data_content = api_response["data"]
+                if isinstance(data_content, dict) and len(data_content) == 1:
+                    record = list(data_content.values())[0]
+                else:
+                    record = data_content
+        else:
+            raise HTTPException(status_code=404, detail="Record not found")
+            
+        print(f"DEBUG: Extracted record: {record}")
         
         # Get related data for context display
         related_data = {}
@@ -628,6 +927,24 @@ async def master_data_delete(request: Request, data_type: str, record_id: str):
         return RedirectResponse(url=f"/admin/master-data/{data_type}?error=Failed to delete record: {e.detail}", status_code=303)
 
 # API endpoints for AJAX requests
+@router.get("/api/master-data/provinces")
+async def get_provinces(request: Request):
+    """Get all provinces (AJAX endpoint)"""
+    user, auth_result = await _check_auth(request)
+    if not user:
+        return JSONResponse({"error": "Authentication required"}, status_code=401)
+    
+    token = auth_result
+    if not isinstance(token, str):
+        return JSONResponse({"error": "Authentication required"}, status_code=401)
+    
+    try:
+        provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+        provinces_data = provinces_response.get("data", {}).get("data", [])
+        return JSONResponse({"data": provinces_data})
+    except HTTPException as e:
+        return JSONResponse({"error": str(e.detail)}, status_code=e.status_code)
+
 @router.get("/api/master-data/districts/{province_code}")
 async def get_districts_by_province(request: Request, province_code: int):
     """Get districts by province code (AJAX endpoint)"""
@@ -636,12 +953,15 @@ async def get_districts_by_province(request: Request, province_code: int):
         return JSONResponse({"error": "Authentication required"}, status_code=401)
     
     token = auth_result
+    if not isinstance(token, str):
+        return JSONResponse({"error": "Authentication required"}, status_code=401)
     
     try:
         districts_response = await stardust_api.get_districts(token, 0, 1000, None, province_code)
-        return JSONResponse({"success": True, "data": districts_response.get("data", [])})
+        districts_data = districts_response.get("data", {}).get("data", [])
+        return JSONResponse({"data": districts_data})
     except HTTPException as e:
-        return JSONResponse({"success": False, "error": str(e.detail)}, status_code=e.status_code)
+        return JSONResponse({"error": str(e.detail)}, status_code=e.status_code)
 
 @router.get("/api/master-data/sub-districts/{district_code}")
 async def get_sub_districts_by_district(request: Request, district_code: int):
@@ -651,9 +971,59 @@ async def get_sub_districts_by_district(request: Request, district_code: int):
         return JSONResponse({"error": "Authentication required"}, status_code=401)
     
     token = auth_result
+    if not isinstance(token, str):
+        return JSONResponse({"error": "Authentication required"}, status_code=401)
     
     try:
         sub_districts_response = await stardust_api.get_sub_districts(token, 0, 1000, None, None, district_code)
-        return JSONResponse({"success": True, "data": sub_districts_response.get("data", [])})
+        sub_districts_data = sub_districts_response.get("data", {}).get("data", [])
+        return JSONResponse({"data": sub_districts_data})
     except HTTPException as e:
-        return JSONResponse({"success": False, "error": str(e.detail)}, status_code=e.status_code)
+        return JSONResponse({"error": str(e.detail)}, status_code=e.status_code)
+
+@router.post("/admin/master-data/hospitals/{record_id}/update-location")
+async def update_hospital_location(request: Request, record_id: str):
+    """Update hospital location and address from Google Maps"""
+    user, auth_result = await _check_auth(request)
+    if not user:
+        return JSONResponse({"error": "Authentication required"}, status_code=401)
+    
+    token = auth_result
+    if not isinstance(token, str):
+        return JSONResponse({"error": "Authentication required"}, status_code=401)
+    
+    try:
+        # Get the request data
+        import json
+        body = await request.body()
+        location_data = json.loads(body)
+        
+        # Validate required fields
+        if not location_data.get("location") or len(location_data["location"]) != 2:
+            return JSONResponse({"error": "Invalid location coordinates"}, status_code=400)
+        
+        # Prepare update data for Stardust API
+        update_data = {
+            "location": location_data["location"]  # [lat, lng]
+        }
+        
+        # If we have formatted address, we could store it in a custom field
+        # Note: The current hospital schema may not have an address field in Stardust
+        # But we can still update the location coordinates
+        
+        # Update the record via Stardust API
+        result = await stardust_api.update_master_data(token, "hospitals", record_id, update_data)
+        
+        return JSONResponse({
+            "success": True, 
+            "message": "Hospital location updated successfully",
+            "data": {
+                "location": location_data["location"],
+                "formatted_address": location_data.get("formatted_address")
+            }
+        })
+        
+    except HTTPException as e:
+        return JSONResponse({"error": str(e.detail)}, status_code=e.status_code)
+    except Exception as e:
+        return JSONResponse({"error": f"Failed to update location: {str(e)}"}, status_code=500)

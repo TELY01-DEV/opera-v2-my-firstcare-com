@@ -55,13 +55,43 @@ async def hospitals_list(request: Request):
         return RedirectResponse(url="/login")
     
     try:
+        # Get filter parameters
+        province_filter = request.query_params.get("province")
+        district_filter = request.query_params.get("district")
+        sub_district_filter = request.query_params.get("sub_district")
+        type_filter = request.query_params.get("type")
+        search_filter = request.query_params.get("search")
+        
         # Fetch hospitals from Stardust API
         hospitals_data = await stardust_api.get_hospitals(token)
+        hospitals = hospitals_data.get("items", [])
+        
+        # Apply filters
+        if province_filter:
+            hospitals = [h for h in hospitals if h.get("province_code") == province_filter]
+        if district_filter:
+            hospitals = [h for h in hospitals if h.get("district_code") == district_filter]
+        if sub_district_filter:
+            hospitals = [h for h in hospitals if h.get("sub_district_code") == sub_district_filter]
+        if type_filter:
+            hospitals = [h for h in hospitals if h.get("hospital_type") == type_filter]
+        if search_filter:
+            search_lower = search_filter.lower()
+            hospitals = [h for h in hospitals if 
+                        search_lower in (h.get("name", "") or "").lower() or
+                        search_lower in (h.get("address", "") or "").lower() or
+                        search_lower in (h.get("province", "") or "").lower() or
+                        search_lower in (h.get("district", "") or "").lower()]
+        
+        # Fetch provinces for the filter dropdown
+        provinces_data = await stardust_api.get_provinces(token, 0, 1000)
+        provinces = provinces_data.get("data", [])
         
         return templates.TemplateResponse("admin/hospitals.html", {
             "request": request,
             "user": user,
-            "hospitals": hospitals_data.get("items", []),
+            "hospitals": hospitals,
+            "provinces": provinces,
             "page_title": "Hospital Management"
         })
     except HTTPException as e:
@@ -69,6 +99,7 @@ async def hospitals_list(request: Request):
             "request": request,
             "user": user,
             "hospitals": [],
+            "provinces": [],
             "error": f"Failed to load hospitals: {e.detail}",
             "page_title": "Hospital Management"
         })

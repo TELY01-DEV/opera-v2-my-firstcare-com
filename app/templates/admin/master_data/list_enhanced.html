@@ -481,141 +481,6 @@
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Enhanced Smart Pagination Controls -->
-                    {% if records %}
-                    <div class="card-footer">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <div class="d-flex align-items-center text-muted">
-                                    <span class="me-2">{{ "แสดง" if language == 'th' else "Show" }}</span>
-                                    <select class="form-select form-select-sm" style="width: 80px;" onchange="changePageSize(this.value)">
-                                        <option value="10" {% if request.query_params.get('limit', '25') == '10' %}selected{% endif %}>10</option>
-                                        <option value="25" {% if request.query_params.get('limit', '25') == '25' %}selected{% endif %}>25</option>
-                                        <option value="50" {% if request.query_params.get('limit', '25') == '50' %}selected{% endif %}>50</option>
-                                        <option value="100" {% if request.query_params.get('limit', '25') == '100' %}selected{% endif %}>100</option>
-                                    </select>
-                                    <span class="ms-2">{{ "รายการต่อหน้า" if language == 'th' else "per page" }}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="col">
-                                <div class="d-flex justify-content-center">
-                                    <div class="text-muted small">
-                                        {% set current_page = (request.query_params.get('skip', 0)|int // request.query_params.get('limit', 25)|int) + 1 %}
-                                        {% set page_size = request.query_params.get('limit', 25)|int %}
-                                        {% set start_item = (current_page - 1) * page_size + 1 %}
-                                        {% set end_item = start_item + records|length - 1 %}
-                                        
-                                        {{ "แสดงรายการที่" if language == 'th' else "Showing" }} 
-                                        <strong>{{ start_item }}</strong> 
-                                        {{ "ถึง" if language == 'th' else "to" }} 
-                                        <strong>{{ end_item }}</strong>
-                                        {% if total_count is defined %}
-                                        {{ "จากทั้งหมด" if language == 'th' else "of" }} 
-                                        <strong>{{ total_count }}</strong> 
-                                        {{ "รายการ" if language == 'th' else "records" }}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-auto">
-                                {% if total_count is defined and total_count > page_size %}
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination pagination-sm m-0">
-                                        {% set current_skip = request.query_params.get('skip', 0)|int %}
-                                        {% set prev_skip = current_skip - page_size %}
-                                        {% set next_skip = current_skip + page_size %}
-                                        
-                                        <!-- Previous Page -->
-                                        <li class="page-item {% if current_skip <= 0 %}disabled{% endif %}">
-                                            {% if current_skip > 0 %}
-                                            <a class="page-link" href="{{ request.url.remove_query_params('skip').include_query_params(skip=prev_skip) }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M15 6l-6 6l6 6"/>
-                                                </svg>
-                                                {{ "ก่อนหน้า" if language == 'th' else "Previous" }}
-                                            </a>
-                                            {% else %}
-                                            <span class="page-link">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M15 6l-6 6l6 6"/>
-                                                </svg>
-                                                {{ "ก่อนหน้า" if language == 'th' else "Previous" }}
-                                            </span>
-                                            {% endif %}
-                                        </li>
-                                        
-                                        <!-- Page Numbers -->
-                                        {% set total_pages = (total_count / page_size)|round(0, 'ceil')|int %}
-                                        {% set current_page_num = (current_skip / page_size)|int + 1 %}
-                                        {% set start_page = [1, current_page_num - 2]|max %}
-                                        {% set end_page = [total_pages, current_page_num + 2]|min %}
-                                        
-                                        {% if start_page > 1 %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ request.url.remove_query_params('skip') }}">1</a>
-                                        </li>
-                                        {% if start_page > 2 %}
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                        {% endif %}
-                                        {% endif %}
-                                        
-                                        {% for page_num in range(start_page, end_page + 1) %}
-                                        {% set page_skip = (page_num - 1) * page_size %}
-                                        <li class="page-item {% if page_num == current_page_num %}active{% endif %}">
-                                            {% if page_num == current_page_num %}
-                                            <span class="page-link">{{ page_num }}</span>
-                                            {% else %}
-                                            <a class="page-link" href="{{ request.url.remove_query_params('skip').include_query_params(skip=page_skip) }}">{{ page_num }}</a>
-                                            {% endif %}
-                                        </li>
-                                        {% endfor %}
-                                        
-                                        {% if end_page < total_pages %}
-                                        {% if end_page < total_pages - 1 %}
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                        {% endif %}
-                                        <li class="page-item">
-                                            {% set last_page_skip = (total_pages - 1) * page_size %}
-                                            <a class="page-link" href="{{ request.url.remove_query_params('skip').include_query_params(skip=last_page_skip) }}">{{ total_pages }}</a>
-                                        </li>
-                                        {% endif %}
-                                        
-                                        <!-- Next Page -->
-                                        <li class="page-item {% if next_skip >= total_count %}disabled{% endif %}">
-                                            {% if next_skip < total_count %}
-                                            <a class="page-link" href="{{ request.url.remove_query_params('skip').include_query_params(skip=next_skip) }}">
-                                                {{ "ถัดไป" if language == 'th' else "Next" }}
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M9 6l6 6l-6 6"/>
-                                                </svg>
-                                            </a>
-                                            {% else %}
-                                            <span class="page-link">
-                                                {{ "ถัดไป" if language == 'th' else "Next" }}
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M9 6l6 6l-6 6"/>
-                                                </svg>
-                                            </span>
-                                            {% endif %}
-                                        </li>
-                                    </ul>
-                                </nav>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -648,9 +513,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             data.data.forEach(district => {
                                 const option = document.createElement('option');
                                 option.value = district.code;
+                                const lang = '{{ language }}';
                                 // Handle both array and object name formats
                                 let displayName = '';
-                                const lang = '{{ language }}';
                                 if (Array.isArray(district.name)) {
                                     const nameItem = district.name.find(item => item.code === lang);
                                     displayName = nameItem ? nameItem.name : (district.name[0] ? district.name[0].name : district.code);
@@ -705,34 +570,6 @@ document.addEventListener('DOMContentLoaded', function() {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-});
-
-// Smart Pagination Functions
-function changePageSize(newLimit) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('limit', newLimit);
-    url.searchParams.delete('skip'); // Reset to first page
-    window.location.href = url.toString();
-}
-
-function goToPage(pageNumber) {
-    const url = new URL(window.location.href);
-    const limit = parseInt(url.searchParams.get('limit') || '25');
-    const skip = (pageNumber - 1) * limit;
-    url.searchParams.set('skip', skip);
-    window.location.href = url.toString();
-}
-
-// Performance optimization: Preload next page
-document.addEventListener('DOMContentLoaded', function() {
-    const nextPageLink = document.querySelector('.pagination .page-item:not(.disabled):last-child a');
-    if (nextPageLink) {
-        // Preload next page for better performance
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = nextPageLink.href;
-        document.head.appendChild(link);
-    }
 });
 </script>
 {% endblock %}

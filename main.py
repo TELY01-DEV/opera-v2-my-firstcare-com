@@ -48,6 +48,8 @@ app.include_router(api.router, prefix="/api", tags=["API"])
 # Import and include master data routes
 from app.routes import master_data
 app.include_router(master_data.router, prefix="/admin", tags=["Master Data"])
+# Also include master data router without prefix for API endpoints
+app.include_router(master_data.router, tags=["Master Data API"])
 
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):

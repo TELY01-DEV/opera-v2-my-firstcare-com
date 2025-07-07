@@ -1,0 +1,108 @@
+{
+  "optimization_plan": {
+    "created_at": "2025-07-07T13:56:30.137917",
+    "total_optimizations": 6,
+    "estimated_total_improvement": "40-60% performance boost",
+    "implementation_phases": [
+      {
+        "phase": 1,
+        "name": "Critical Database Indexes",
+        "description": "Implement high-impact database indexes",
+        "optimizations": [
+          {
+            "type": "mongodb_text_index",
+            "collection": "organizations",
+            "index": {
+              "name.th": "text",
+              "name.en": "text",
+              "formatted_address": "text"
+            },
+            "description": "Full-text search index for name and address fields",
+            "estimated_improvement": "50-70% faster text searches",
+            "mongodb_command": "db.organizations.createIndex({\"name.th\": \"text\", \"name.en\": \"text\", \"formatted_address\": \"text\"})",
+            "priority": "high"
+          }
+        ],
+        "estimated_duration": "1-2 hours",
+        "estimated_improvement": "30-50%"
+      },
+      {
+        "phase": 2,
+        "name": "UI Performance Optimizations",
+        "description": "Improve pagination and UI responsiveness",
+        "optimizations": [
+          {
+            "type": "ui_optimization",
+            "component": "pagination",
+            "description": "Implement smarter pagination with default limits",
+            "improvements": [
+              "Set default page size to 25 items",
+              "Add page size selector (10, 25, 50)",
+              "Implement infinite scroll for better UX",
+              "Add total count caching"
+            ],
+            "estimated_improvement": "20-30% faster page loads",
+            "priority": "medium"
+          },
+          {
+            "type": "ui_optimization",
+            "component": "pagination",
+            "description": "Implement smarter pagination with default limits",
+            "improvements": [
+              "Set default page size to 25 items",
+              "Add page size selector (10, 25, 50)",
+              "Implement infinite scroll for better UX",
+              "Add total count caching"
+            ],
+            "estimated_improvement": "20-30% faster page loads",
+            "priority": "medium"
+          }
+        ],
+        "estimated_duration": "2-4 hours",
+        "estimated_improvement": "10-20%"
+      },
+      {
+        "phase": 3,
+        "name": "Advanced Compound Indexes",
+        "description": "Implement compound indexes for complex queries",
+        "optimizations": [
+          {
+            "type": "mongodb_compound_index",
+            "collection": "organizations",
+            "index": {
+              "is_active": 1,
+              "province_code": 1
+            },
+            "description": "Compound index for status + province filtering",
+            "mongodb_command": "db.organizations.createIndex({is_active: 1, province_code: 1})",
+            "use_case": "Filter active hospitals by province"
+          },
+          {
+            "type": "mongodb_compound_index",
+            "collection": "organizations",
+            "index": {
+              "is_active": 1,
+              "district_code": 1
+            },
+            "description": "Compound index for status + district filtering",
+            "mongodb_command": "db.organizations.createIndex({is_active: 1, district_code: 1})",
+            "use_case": "Filter active hospitals by district"
+          },
+          {
+            "type": "mongodb_compound_index",
+            "collection": "organizations",
+            "index": {
+              "location": "2dsphere",
+              "is_active": 1
+            },
+            "description": "Geospatial index with status for location-based queries",
+            "mongodb_command": "db.organizations.createIndex({location: \"2dsphere\", is_active: 1})",
+            "use_case": "Find active hospitals near location"
+          }
+        ],
+        "estimated_duration": "1-2 hours",
+        "estimated_improvement": "15-25%"
+      }
+    ]
+  }
+}
