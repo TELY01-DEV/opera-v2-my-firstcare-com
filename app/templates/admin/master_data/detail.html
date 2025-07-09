@@ -1088,6 +1088,41 @@
                                     </details>
                                 </div>
                             </div>
+
+                            {% if data_type == 'hospitals' and raw_document_data %}
+                            <!-- Raw MongoDB Document Data -->
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">{{ "ข้อมูล MongoDB ดิบ" if language == 'th' else "Raw MongoDB Document" }}</div>
+                                <div class="datagrid-content">
+                                    <details>
+                                        <summary class="btn btn-outline-warning btn-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-database" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                                <path d="M21 12c0 1.66 -4 3 -9 3s-9 -1.34 -9 -3"/>
+                                                <path d="M3 5v14c0 1.66 4 3 9 3s9 -1.34 9 -3v-14"/>
+                                            </svg>
+                                            {{ "แสดงข้อมูล MongoDB ดิบ" if language == 'th' else "Show Raw MongoDB Document" }}
+                                        </summary>
+                                        <div class="mt-2">
+                                            <div class="alert alert-info">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <circle cx="12" cy="12" r="9"/>
+                                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                                    <polyline points="11,12 12,12 12,16 13,16"/>
+                                                </svg>
+                                                <div>
+                                                    <h4>{{ "ข้อมูลระดับเทคนิค" if language == 'th' else "Technical Data" }}</h4>
+                                                    <p class="mb-0">{{ "ข้อมูลนี้เป็นเอกสารดิบจากฐานข้อมูล MongoDB สำหรับการดูแลระบบและการแก้ไขปัญหาขั้นสูง" if language == 'th' else "This is the raw MongoDB document for system administration and advanced troubleshooting." }}</p>
+                                                </div>
+                                            </div>
+                                            <pre class="bg-dark text-white p-3 rounded" style="font-size: 11px; max-height: 400px; overflow-y: auto;"><code>{{ raw_document_data | tojson(indent=2) }}</code></pre>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -57,16 +57,9 @@
                                 <label class="form-label">Province</label>
                                 <select class="form-select" id="province-filter">
                                     <option value="">All Provinces</option>
+                                    <!-- Debug: provinces count = {{ provinces|length }} -->
                                     {% for province in provinces %}
-                                    <option value="{{ province.code }}">
-                                        {% if province.name.en %}
-                                            {{ province.name.en }}
-                                        {% elif province.name %}
-                                            {{ province.name }}
-                                        {% else %}
-                                            {{ province.code }}
-                                        {% endif %}
-                                    </option>
+                                    <option value="{{ province.code }}">{{ province.en_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

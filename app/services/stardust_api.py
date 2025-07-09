@@ -20,6 +20,10 @@ class StardustAPIService:
         
         url = f"{self.base_url}{endpoint}"
         
+        print(f"DEBUG: Making Stardust API request to {url}")
+        print(f"DEBUG: Token: {token[:20]}...")
+        print(f"DEBUG: Method: {method}, Params: {params}")
+        
         try:
             response = await self.client.request(
                 method=method,
@@ -29,14 +33,21 @@ class StardustAPIService:
                 params=params
             )
             
+            print(f"DEBUG: Response status: {response.status_code}")
+            
             if response.status_code == 401:
+                print(f"DEBUG: 401 Error response: {response.text}")
                 raise HTTPException(status_code=401, detail="Authentication failed")
             elif response.status_code == 403:
+                print(f"DEBUG: 403 Error response: {response.text}")
                 raise HTTPException(status_code=403, detail="Access forbidden")
             elif response.status_code >= 400:
+                print(f"DEBUG: Error response: {response.text}")
                 raise HTTPException(status_code=response.status_code, detail=f"API error: {response.text}")
             
-            return response.json()
+            result = response.json()
+            print(f"DEBUG: Response keys: {list(result.keys()) if isinstance(result, dict) else 'Not a dict'}")
+            return result
             
         except httpx.RequestError as e:
             raise HTTPException(status_code=503, detail=f"Stardust API service unavailable: {str(e)}")
@@ -134,6 +145,28 @@ class StardustAPIService:
         """Get hospital by ID"""
         return await self._make_request("GET", f"/hospitals/{hospital_id}", token)
 
+    async def get_hospitals_raw_documents(self, token: str, skip: int = 0, limit: int = 5, 
+                                        hospital_id: Optional[str] = None, include_deleted: bool = False,
+                                        province_code: Optional[int] = None, district_code: Optional[int] = None,
+                                        sub_district_code: Optional[int] = None):
+        """Get raw hospital documents from MongoDB"""
+        params = {
+            "skip": skip,
+            "limit": limit,
+            "include_deleted": include_deleted
+        }
+        
+        if hospital_id:
+            params["hospital_id"] = hospital_id
+        if province_code:
+            params["province_code"] = province_code
+        if district_code:
+            params["district_code"] = district_code
+        if sub_district_code:
+            params["sub_district_code"] = sub_district_code
+            
+        return await self._make_request("GET", "/admin/hospitals-raw-documents", token, params=params)
+
     # Analytics operations
     async def get_patient_count(self, token: str):
         """Get total patient count"""
@@ -165,8 +198,9 @@ class StardustAPIService:
     # Master Data operations
     async def get_master_data(self, token: str, data_type: str, skip: int = 0, limit: int = 100, 
                              search: Optional[str] = None, province_code: Optional[int] = None, 
-                             district_code: Optional[int] = None, is_active: Optional[bool] = None,
-                             date_from: Optional[str] = None, date_to: Optional[str] = None):
+                             district_code: Optional[int] = None, sub_district_code: Optional[int] = None,
+                             is_active: Optional[bool] = None, date_from: Optional[str] = None, 
+                             date_to: Optional[str] = None):
         """Get master data by type"""
         # Map data types to actual Stardust endpoints (using working endpoints found)
         endpoint_mapping = {
@@ -191,8 +225,11 @@ class StardustAPIService:
             params["province_code"] = province_code
         if district_code:
             params["district_code"] = district_code
+        if sub_district_code:
+            params["sub_district_code"] = sub_district_code
         if is_active is not None:
             params["is_active"] = is_active
+            print(f"DEBUG: Adding is_active parameter: {is_active} (type: {type(is_active)})")
         if date_from:
             params["date_from"] = date_from
         if date_to:
@@ -251,7 +288,7 @@ class StardustAPIService:
     # Province operations
     async def get_provinces(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None):
         """Get list of provinces"""
-        return await self.get_master_data(token, "provinces", skip, limit, search)
+        return await self._make_request("GET", "/admin/dropdown/provinces", token, params={"limit": limit, "skip": skip})
 
     async def get_province(self, token: str, province_id: str):
         """Get province by ID"""
@@ -274,11 +311,42 @@ class StardustAPIService:
     async def get_districts(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None, 
                            province_code: Optional[int] = None):
         """Get list of districts"""
-        return await self.get_master_data(token, "districts", skip, limit, search, province_code)
+        params = {"limit": limit, "skip": skip}
+        if province_code:
+            params["province_code"] = province_code
+        return await self._make_request("GET", "/admin/dropdown/districts", token, params=params)
 
     async def get_district(self, token: str, district_id: str):
         """Get district by ID"""
         return await self.get_master_data_record(token, "districts", district_id)
+
+    async def find_district_by_code(self, token: str, district_code: str):
+        """Find a district by its code across all provinces"""
+        try:
+            # First get all provinces
+            provinces_response = await self.get_provinces(token, 0, 1000)
+            provinces = provinces_response.get("data", [])
+            
+            # Search through each province's districts
+            for province in provinces:
+                province_code = province.get("code")
+                if province_code:
+                    try:
+                        districts_response = await self.get_districts(token, 0, 1000, None, province_code)
+                        districts = districts_response.get("data", [])
+                        
+                        # Look for the district with the matching code
+                        for district in districts:
+                            if str(district.get("code")) == str(district_code):
+                                return district
+                    except Exception as e:
+                        print(f"Error fetching districts for province {province_code}: {e}")
+                        continue
+            
+            return None
+        except Exception as e:
+            print(f"Error finding district by code {district_code}: {e}")
+            return None
 
     async def create_district(self, token: str, district_data: dict):
         """Create new district"""
@@ -297,7 +365,12 @@ class StardustAPIService:
     async def get_sub_districts(self, token: str, skip: int = 0, limit: int = 100, search: Optional[str] = None, 
                                province_code: Optional[int] = None, district_code: Optional[int] = None):
         """Get list of sub-districts"""
-        return await self.get_master_data(token, "sub-districts", skip, limit, search, province_code, district_code)
+        params = {"limit": limit, "skip": skip}
+        if province_code:
+            params["province_code"] = province_code
+        if district_code:
+            params["district_code"] = district_code
+        return await self._make_request("GET", "/admin/dropdown/sub-districts", token, params=params)
 
     async def get_sub_district(self, token: str, sub_district_id: str):
         """Get sub-district by ID"""

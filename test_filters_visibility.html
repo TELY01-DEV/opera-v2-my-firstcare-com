@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Filters Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Hospital Location Filters Test</h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Hospitals</h3>
+            </div>
+            
+            <!-- Location Filters -->
+            <div class="card-body border-bottom">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Province</label>
+                        <select class="form-select" id="province-filter">
+                            <option value="">All Provinces</option>
+                            <option value="10">Bangkok</option>
+                            <option value="11">Samut Prakan</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">District</label>
+                        <select class="form-select" id="district-filter">
+                            <option value="">All Districts</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Sub-District</label>
+                        <select class="form-select" id="sub-district-filter">
+                            <option value="">All Sub-Districts</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Hospital Type</label>
+                        <select class="form-select" id="type-filter">
+                            <option value="">All Types</option>
+                            <option value="general">General Hospital</option>
+                            <option value="specialty">Specialty Hospital</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary" id="apply-filters">Apply Filters</button>
+                        <button type="button" class="btn btn-secondary" id="clear-filters">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hospital Table -->
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Hospital ID</th>
+                            <th>Name</th>
+                            <th>Location</th>
+                            <th>Sub-District</th>
+                            <th>Type</th>
+                            <th>Contact</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>H001</td>
+                            <td>Test Hospital</td>
+                            <td>Bangkok</td>
+                            <td>Pathum Wan</td>
+                            <td>General</td>
+                            <td>02-123-4567</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">View</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Filter elements found:');
+        console.log('Province filter:', document.getElementById('province-filter'));
+        console.log('District filter:', document.getElementById('district-filter'));
+        console.log('Sub-District filter:', document.getElementById('sub-district-filter'));
+        console.log('Type filter:', document.getElementById('type-filter'));
+        console.log('Apply button:', document.getElementById('apply-filters'));
+        console.log('Clear button:', document.getElementById('clear-filters'));
+        
+        // Test if filters are visible
+        const filterSection = document.querySelector('.card-body.border-bottom');
+        console.log('Filter section:', filterSection);
+        console.log('Filter section visible:', filterSection && filterSection.offsetHeight > 0);
+    </script>
+</body>
+</html>

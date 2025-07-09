@@ -44,6 +44,7 @@ class AuthService:
                     return Token(
                         access_token=data["access_token"],
                         token_type=data.get("token_type", "bearer"),
+                        refresh_token=data.get("refresh_token"),
                         expires_in=data.get("expires_in")
                     )
                 else:
@@ -52,6 +53,7 @@ class AuthService:
                     return Token(
                         access_token=token_data["access_token"],
                         token_type=token_data.get("token_type", "bearer"),
+                        refresh_token=token_data.get("refresh_token"),
                         expires_in=token_data.get("expires_in")
                     )
             else:
@@ -65,27 +67,62 @@ class AuthService:
                 detail=f"Authentication service unavailable: {str(e)}"
             )
 
+    async def refresh_token(self, refresh_token: str) -> Token:
+        """Refresh access token using refresh token"""
+        try:
+            response = await self.client.post(
+                f"{self.auth_url}/auth/refresh",
+                json={"refresh_token": refresh_token},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Handle the new API response structure
+                if "access_token" in data:
+                    # Direct response format
+                    return Token(
+                        access_token=data["access_token"],
+                        token_type=data.get("token_type", "bearer"),
+                        refresh_token=data.get("refresh_token", refresh_token),  # Keep existing refresh token if not provided
+                        expires_in=data.get("expires_in")
+                    )
+                else:
+                    # Wrapped response format
+                    token_data = data.get("data", data)
+                    return Token(
+                        access_token=token_data["access_token"],
+                        token_type=token_data.get("token_type", "bearer"),
+                        refresh_token=token_data.get("refresh_token", refresh_token),  # Keep existing refresh token if not provided
+                        expires_in=token_data.get("expires_in")
+                    )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid refresh token"
+                )
+        except httpx.RequestError as e:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Authentication service unavailable: {str(e)}"
+            )
+
     async def get_user_profile(self, token: str) -> UserProfile:
         """Get user profile from Stardust-V1 API"""
         try:
-            print(f"DEBUG: Making request to {self.auth_url}/auth/me with token: {token[:20]}...")
             response = await self.client.get(
                 f"{self.auth_url}/auth/me",
                 headers={"Authorization": f"Bearer {token}"}
             )
             
-            print(f"DEBUG: Stardust API response status: {response.status_code}")
             if response.status_code == 200:
                 response_data = response.json()
-                print(f"DEBUG: Raw API response: {response_data}")
                 
                 # Handle the new API response structure with data wrapper
                 if "data" in response_data:
                     data = response_data["data"]
-                    print(f"DEBUG: Using wrapped data: {data.get('username', 'unknown')}")
                 else:
                     data = response_data
-                    print(f"DEBUG: Using direct data: {data.get('username', 'unknown')}")
                 
                 # Create SystemAccess object if system_access data exists
                 system_access = None
@@ -106,13 +143,12 @@ class AuthService:
                     system_access=system_access
                 )
             else:
-                print(f"DEBUG: Stardust API error response: {response.text}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid token"
                 )
         except httpx.RequestError as e:
-            print(f"DEBUG: Network error connecting to Stardust: {str(e)}")
+            print(f"Network error connecting to Stardust: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Authentication service unavailable: {str(e)}"
@@ -171,4 +207,90 @@ async def get_current_user_optional(request: Request) -> Optional[User]:
             system_access=profile.system_access
         )
     except:
+        return None
+
+async def get_current_user_with_refresh(request: Request) -> Optional[User]:
+    """Get current user from session with automatic token refresh"""
+    try:
+        token = request.session.get("access_token")
+        refresh_token = request.session.get("refresh_token")
+        
+        if not token:
+            return None
+        
+        # Try to get user profile with current token
+        try:
+            profile = await auth_service.get_user_profile(token)
+            return User(
+                id=profile.id or profile.username,
+                username=profile.username,
+                email=profile.email,
+                full_name=profile.full_name,
+                role=profile.role,
+                profile_photo=profile.profile_photo,
+                phone=profile.phone,
+                permissions=profile.permissions or [],
+                system_access=profile.system_access
+            )
+        except HTTPException as e:
+            # If token is invalid/expired and we have refresh token, try to refresh
+            if e.status_code == 401 and refresh_token:
+                print(f"DEBUG: Access token expired, attempting refresh...")
+                try:
+                    new_token = await auth_service.refresh_token(refresh_token)
+                    # Update session with new tokens
+                    request.session["access_token"] = new_token.access_token
+                    if new_token.refresh_token:
+                        request.session["refresh_token"] = new_token.refresh_token
+                    
+                    # Try again with new token
+                    profile = await auth_service.get_user_profile(new_token.access_token)
+                    return User(
+                        id=profile.id or profile.username,
+                        username=profile.username,
+                        email=profile.email,
+                        full_name=profile.full_name,
+                        role=profile.role,
+                        profile_photo=profile.profile_photo,
+                        phone=profile.phone,
+                        permissions=profile.permissions or [],
+                        system_access=profile.system_access
+                    )
+                except HTTPException as refresh_error:
+                    print(f"Token refresh failed: {refresh_error.detail}")
+                    return None
+            return None
+    except Exception as e:
+        print(f"Error in get_current_user_with_refresh: {str(e)}")
+        return None
+
+async def get_valid_token(request: Request) -> Optional[str]:
+    """Get a valid access token, refreshing if necessary"""
+    try:
+        token = request.session.get("access_token")
+        refresh_token = request.session.get("refresh_token")
+        
+        if not token:
+            return None
+        
+        # Try to use the current token by making a simple API call
+        try:
+            await auth_service.get_user_profile(token)
+            return token  # Token is valid
+        except HTTPException as e:
+            # If token is invalid/expired and we have refresh token, try to refresh
+            if e.status_code == 401 and refresh_token:
+                try:
+                    new_token = await auth_service.refresh_token(refresh_token)
+                    # Update session with new tokens
+                    request.session["access_token"] = new_token.access_token
+                    if new_token.refresh_token:
+                        request.session["refresh_token"] = new_token.refresh_token
+                    return new_token.access_token
+                except HTTPException as refresh_error:
+                    print(f"Token refresh failed: {refresh_error.detail}")
+                    return None
+            return None
+    except Exception as e:
+        print(f"Error in get_valid_token: {str(e)}")
         return None

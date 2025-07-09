@@ -156,6 +156,29 @@
                 </div>
                 {% endif %}
                 
+                <!-- Sub-District Filter -->
+                {% if data_type == 'hospitals' %}
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"/>
+                            <path d="M9 4v13"/>
+                            <path d="M15 7v13"/>
+                        </svg>
+                        {{ "ตำบล" if language == 'th' else "Sub-District" }}
+                    </label>
+                    <select class="form-select" name="sub_district_code" id="sub_district_select">
+                        <option value="">{{ "ทุกตำบล" if language == 'th' else "All Sub-Districts" }}</option>
+                        {% for sub_district in sub_districts %}
+                        <option value="{{ sub_district.code }}" {% if sub_district_code == sub_district.code %}selected{% endif %}>
+                            {{ sub_district.name | localized_name(language) }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                
                 <!-- Enhanced Status Filter -->
                 <div class="col-md-2">
                     <div class="status-filter-container">
@@ -169,10 +192,10 @@
                         </label>
                         <select class="form-select status-filter" name="is_active">
                             <option value="">{{ "ทุกสถานะ" if language == 'th' else "All Status" }}</option>
-                            <option value="true" class="status-option-active" {% if is_active == true %}selected{% endif %}>
+                            <option value="true" class="status-option-active" {% if is_active == "true" %}selected{% endif %}>
                                 {{ "ใช้งาน" if language == 'th' else "Active" }}
                             </option>
-                            <option value="false" class="status-option-inactive" {% if is_active == false %}selected{% endif %}>
+                            <option value="false" class="status-option-inactive" {% if is_active == "false" %}selected{% endif %}>
                                 {{ "ไม่ใช้งาน" if language == 'th' else "Inactive" }}
                             </option>
                         </select>
@@ -311,6 +334,7 @@
                                     <th>{{ "อำเภอ" if language == 'th' else "District" }}</th>
                                     {% endif %}
                                     {% if data_type == 'hospitals' %}
+                                    <th>{{ "ตำบล" if language == 'th' else "Sub-District" }}</th>
                                     <th>{{ "ประเภท" if language == 'th' else "Type" }}</th>
                                     {% endif %}
                                     <th>{{ "สถานะ" if language == 'th' else "Status" }}</th>
@@ -321,7 +345,7 @@
                             <tbody>
                                 {% if records %}
                                     {% for record in records %}
-                                    <tr class="slide-in" style="animation-delay: {{ loop.index0 * 0.05 }}s;">
+                                    <tr class="slide-in" style="animation-delay: {{ (loop.index0 * 0.05)|string }}s;">
                                         <td>
                                             <div class="d-flex py-1 align-items-center">
                                                 <div class="flex-fill">
@@ -365,12 +389,21 @@
                                         {% endif %}
                                         {% if data_type == 'hospitals' %}
                                         <td>
-                                            {% if record.additional_fields and record.additional_fields.hospital_type_code %}
-                                                {% for hospital_type in hospital_types %}
-                                                    {% if hospital_type.code|string == record.additional_fields.hospital_type_code|string %}
-                                                        <span class="badge bg-info-lt">{{ hospital_type.name | localized_name(language) }}</span>
-                                                    {% endif %}
-                                                {% endfor %}
+                                            {% set sub_district_found = false %}
+                                            {% for sub_district in sub_districts %}
+                                                {% if sub_district.code|string == record.sub_district_code|string %}
+                                                    <span class="text-info">{{ sub_district.name | localized_name(language) }}</span>
+                                                    {% set sub_district_found = true %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if not sub_district_found %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set matching_type = hospital_types | selectattr("code", "equalto", record.hospital_type_code) | first %}
+                                            {% if matching_type %}
+                                                <span class="text-success">{{ matching_type.name | localized_name(language) }}</span>
                                             {% else %}
                                                 <span class="text-muted">-</span>
                                             {% endif %}
@@ -454,7 +487,7 @@
                                                 {{ "ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา" if language == 'th' else "No records match your search criteria" }}
                                             </p>
                                             <div class="empty-action">
-                                                {% if search or province_code or district_code or is_active is not none or date_from or date_to %}
+                                                {% if search or province_code or district_code or sub_district_code or is_active is not none or date_from or date_to %}
                                                 <a href="/admin/master-data/{{ data_type }}" class="btn btn-outline-primary">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -603,8 +636,7 @@
                                             <span class="page-link">
                                                 {{ "ถัดไป" if language == 'th' else "Next" }}
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M9 6l6 6l-6 6"/>
+                                                    <path stroke="none" d="M9 6l6 6l-6 6"/>
                                                 </svg>
                                             </span>
                                             {% endif %}
@@ -628,6 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cascade dropdown functionality
     const provinceSelect = document.getElementById('province_select');
     const districtSelect = document.getElementById('district_select');
+    const subDistrictSelect = document.getElementById('sub_district_select');
     
     if (provinceSelect && districtSelect) {
         provinceSelect.addEventListener('change', function() {
@@ -636,6 +669,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add loading state
             districtSelect.innerHTML = '<option value="">{{ "กำลังโหลด..." if language == "th" else "Loading..." }}</option>';
             districtSelect.disabled = true;
+            
+            // Clear sub-districts when province changes
+            if (subDistrictSelect) {
+                subDistrictSelect.innerHTML = '<option value="">{{ "เลือกตำบล" if language == "th" else "Select Sub-District" }}</option>';
+                subDistrictSelect.disabled = true;
+            }
             
             if (provinceCode) {
                 // Fetch districts for selected province
@@ -678,12 +717,75 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    if (districtSelect && subDistrictSelect) {
+        districtSelect.addEventListener('change', function() {
+            const districtCode = this.value;
+            const provinceCode = provinceSelect ? provinceSelect.value : '';
+            
+            // Add loading state
+            subDistrictSelect.innerHTML = '<option value="">{{ "กำลังโหลด..." if language == "th" else "Loading..." }}</option>';
+            subDistrictSelect.disabled = true;
+            
+            if (districtCode && provinceCode) {
+                // Fetch sub-districts for selected district and province
+                fetch(`/api/master-data/sub-districts/${districtCode}?province_code=${provinceCode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        subDistrictSelect.innerHTML = '<option value="">{{ "เลือกตำบล" if language == "th" else "Select Sub-District" }}</option>';
+                        
+                        if (data.data) {
+                            data.data.forEach(sub_district => {
+                                const option = document.createElement('option');
+                                option.value = sub_district.code;
+                                // Handle both array and object name formats
+                                let displayName = '';
+                                const lang = '{{ language }}';
+                                if (Array.isArray(sub_district.name)) {
+                                    const nameItem = sub_district.name.find(item => item.code === lang);
+                                    displayName = nameItem ? nameItem.name : (sub_district.name[0] ? sub_district.name[0].name : sub_district.code);
+                                } else if (typeof sub_district.name === 'object') {
+                                    displayName = sub_district.name[lang] || sub_district.name.en || sub_district.code;
+                                } else {
+                                    displayName = sub_district.name || sub_district.code;
+                                }
+                                option.textContent = displayName;
+                                subDistrictSelect.appendChild(option);
+                            });
+                        }
+                        
+                        subDistrictSelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching sub-districts:', error);
+                        subDistrictSelect.innerHTML = '<option value="">{{ "เกิดข้อผิดพลาด" if language == "th" else "Error loading" }}</option>';
+                        subDistrictSelect.disabled = true;
+                    });
+            } else if (districtCode && !provinceCode) {
+                // District selected but no province
+                subDistrictSelect.innerHTML = '<option value="">{{ "เลือกจังหวัดก่อน" if language == "th" else "Select Province first" }}</option>';
+                subDistrictSelect.disabled = true;
+            } else {
+                subDistrictSelect.innerHTML = '<option value="">{{ "เลือกตำบล" if language == "th" else "Select Sub-District" }}</option>';
+                subDistrictSelect.disabled = false;
+            }
+        });
+    }
+    
     // Auto-submit form on filter change (optional)
     const autoSubmitSelects = document.querySelectorAll('.form-select[name="is_active"]');
     autoSubmitSelects.forEach(select => {
         select.addEventListener('change', function() {
-            // Optional: Auto-submit form when status filter changes
-            // this.closest('form').submit();
+            // Show loading indicator
+            const form = this.closest('form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>{{ "กำลังโหลด..." if language == "th" else "Loading..." }}';
+                submitBtn.disabled = true;
+                
+                // Submit form
+                form.submit();
+            }
         });
     });
     
@@ -702,9 +804,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Tooltips for action buttons
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
 });
 
 // Smart Pagination Functions

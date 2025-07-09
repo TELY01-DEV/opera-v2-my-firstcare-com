@@ -13,7 +13,7 @@ LOGIN_URL = f"{BASE_URL}/auth/login"
 HOSPITALS_URL = f"{BASE_URL}/admin/master-data/hospitals"
 
 # Test credentials - using the credentials from logs
-TEST_USERNAME = "operapanel"
+TEST_USERNAME = "admin"
 TEST_PASSWORD = "Sim!443355"  # You'll need to set this
 
 async def login_and_get_session():

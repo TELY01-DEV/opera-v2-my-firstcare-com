@@ -84,8 +84,13 @@ async def hospitals_list(request: Request):
                         search_lower in (h.get("district", "") or "").lower()]
         
         # Fetch provinces for the filter dropdown
-        provinces_data = await stardust_api.get_provinces(token, 0, 1000)
-        provinces = provinces_data.get("data", [])
+        try:
+            provinces_data = await stardust_api.get_provinces(token, 0, 1000)
+            provinces = provinces_data.get("data", {}).get("provinces", [])
+            print(f"DEBUG: Fetched {len(provinces)} provinces")
+        except Exception as e:
+            print(f"DEBUG: Error fetching provinces: {e}")
+            provinces = []
         
         return templates.TemplateResponse("admin/hospitals.html", {
             "request": request,

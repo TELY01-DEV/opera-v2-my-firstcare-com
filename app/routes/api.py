@@ -336,3 +336,127 @@ async def delete_qube_vital_device(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ===============================
+# MASTER DATA DROPDOWN OPERATIONS
+# ===============================
+
+@router.get("/master-data/provinces")
+async def get_provinces_dropdown(request: Request):
+    """Get provinces for dropdown"""
+    token = request.session.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        provinces_response = await stardust_api.get_provinces(token, 0, 1000)
+        
+        # Handle nested structure for provinces
+        if "data" in provinces_response and "provinces" in provinces_response["data"]:
+            provinces = provinces_response["data"]["provinces"]
+        elif "data" in provinces_response and "data" in provinces_response["data"]:
+            provinces = provinces_response["data"]["data"]
+        elif "data" in provinces_response:
+            provinces = provinces_response["data"]
+        else:
+            provinces = []
+        
+        # Normalize data structure
+        normalized_provinces = []
+        for province in provinces:
+            if isinstance(province, dict):
+                normalized_province = province.copy()
+                # Convert en_name/th_name to name structure
+                if 'en_name' in province and 'th_name' in province:
+                    normalized_province['name'] = {
+                        'en': province['en_name'],
+                        'th': province['th_name']
+                    }
+                normalized_provinces.append(normalized_province)
+            else:
+                normalized_provinces.append(province)
+        
+        return JSONResponse(content={"data": normalized_provinces})
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/master-data/districts/{province_code}")
+async def get_districts_dropdown(request: Request, province_code: int):
+    """Get districts for dropdown by province"""
+    token = request.session.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        districts_response = await stardust_api.get_districts(token, 0, 1000, None, province_code)
+        
+        # Handle nested structure for districts
+        if "data" in districts_response and "districts" in districts_response["data"]:
+            districts = districts_response["data"]["districts"]
+        elif "data" in districts_response and "data" in districts_response["data"]:
+            districts = districts_response["data"]["data"]
+        elif "data" in districts_response:
+            districts = districts_response["data"]
+        else:
+            districts = []
+        
+        # Normalize data structure
+        normalized_districts = []
+        for district in districts:
+            if isinstance(district, dict):
+                normalized_district = district.copy()
+                # Convert en_name/th_name to name structure
+                if 'en_name' in district and 'th_name' in district:
+                    normalized_district['name'] = {
+                        'en': district['en_name'],
+                        'th': district['th_name']
+                    }
+                normalized_districts.append(normalized_district)
+            else:
+                normalized_districts.append(district)
+        
+        return JSONResponse(content={"data": normalized_districts})
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/master-data/sub-districts/{district_code}")
+async def get_sub_districts_dropdown(request: Request, district_code: int, province_code: int):
+    """Get sub-districts for dropdown by district and province"""
+    token = request.session.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        sub_districts_response = await stardust_api.get_sub_districts(token, 0, 1000, None, province_code, district_code)
+        
+        # Handle nested structure for sub-districts
+        if "data" in sub_districts_response and "sub_districts" in sub_districts_response["data"]:
+            sub_districts = sub_districts_response["data"]["sub_districts"]
+        elif "data" in sub_districts_response and "data" in sub_districts_response["data"]:
+            sub_districts = sub_districts_response["data"]["data"]
+        elif "data" in sub_districts_response:
+            sub_districts = sub_districts_response["data"]
+        else:
+            sub_districts = []
+        
+        # Normalize data structure
+        normalized_sub_districts = []
+        for sub_district in sub_districts:
+            if isinstance(sub_district, dict):
+                normalized_sub_district = sub_district.copy()
+                # Convert en_name/th_name to name structure
+                if 'en_name' in sub_district and 'th_name' in sub_district:
+                    normalized_sub_district['name'] = {
+                        'en': sub_district['en_name'],
+                        'th': sub_district['th_name']
+                    }
+                normalized_sub_districts.append(normalized_sub_district)
+            else:
+                normalized_sub_districts.append(sub_district)
+        
+        return JSONResponse(content={"data": normalized_sub_districts})
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

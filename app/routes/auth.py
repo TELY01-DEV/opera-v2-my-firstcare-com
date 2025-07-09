@@ -18,11 +18,14 @@ async def login(request: Request, login_data: LoginRequest):
         print(f"DEBUG: Login attempt for user: {login_data.username}")
         token = await auth_service.login(login_data)
         print(f"DEBUG: Successfully got token from Stardust: {token.access_token[:20]}...")
+        print(f"DEBUG: Refresh token: {token.refresh_token[:20] if token.refresh_token else 'None'}...")
         
-        # Store token in session
+        # Store tokens in session
         request.session["access_token"] = token.access_token
-        print(f"DEBUG: Token stored in session")
-        print(f"DEBUG: Session after storing token: {dict(request.session)}")
+        if token.refresh_token:
+            request.session["refresh_token"] = token.refresh_token
+        print(f"DEBUG: Tokens stored in session")
+        print(f"DEBUG: Session after storing tokens: {dict(request.session)}")
         
         return JSONResponse(
             content={"success": True, "message": "Login successful"},
@@ -44,10 +47,13 @@ async def login_form(request: Request, username: str = Form(...), password: str 
         login_data = LoginRequest(username=username, password=password)
         token = await auth_service.login(login_data)
         print(f"DEBUG: Successfully got token from Stardust: {token.access_token[:20]}...")
+        print(f"DEBUG: Refresh token: {token.refresh_token[:20] if token.refresh_token else 'None'}...")
         
-        # Store token in session
+        # Store tokens in session
         request.session["access_token"] = token.access_token
-        print(f"DEBUG: Token stored in session")
+        if token.refresh_token:
+            request.session["refresh_token"] = token.refresh_token
+        print(f"DEBUG: Tokens stored in session")
         
         # Redirect to dashboard
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
